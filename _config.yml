@@ -1,17 +1,12 @@
 # Site settings
-title:          Tale
-description:    "Minimal Jekyll theme for storytellers"
-baseurl:        "/tale"
-url:            "https://chesterhow.github.io"
-
-# Google Analytics
-google_analytics: UA—XXXXXXXX-X
+title:          Megan Verbakel
+description:    "Data science notes"
+url:            "https://mverbakel.github.io"
 
 # Author
 author:
-  name:         Chester How
-  url:          https://chester.how
-  email:        chesterhow@gmail.com
+  name:         Megan Verbakel
+  email:        megan.verbakel@gmail.com
 
 # Build settings
 markdown:       kramdown
@@ -36,6 +31,3 @@ paginate:       5
 
 # Excludes
 exclude: [ Gemfile, Gemfile.lock, tale.gemspec ]
-
-# Disqus (Set to your disqus id)
-disqus:         jekyll-tale
