@@ -1,15 +1,10 @@
 ---
 layout: post
 title: "About"
-author: "Chester"
 permalink: /about/
 ---
 
-A friend of mine writes short stories. One sunny day, I asked if he wanted a website to showcase his works and he agreed. I decided to use GitHub Pages to host his site. That way he wouldn't have to buy a domain and a server.
+I'm a data scientist with almost a decade of experience applying statistics and machine learning in tech, finance, and government. Starting out with a business degree, a chance placement in a research team led to my love of all things data and statistics. While working full time, I completed postgraduate studies in statistics at Canberra University, and earned a Masters in Business Analytics from Deakin University. These days I'm a data scientist in a global travel company in Amsterdam. I'm endlessly curious, so I continue to spend my spare time studying and learning new/creative techniques to improve my work. However, to balance all that time at my desk, I love to travel, hike, and have a coffee in the park with my husband.
 
-While doing some research up on GitHub Pages, I accidentally chanced upon this _simple, blog-aware, static site generator_ called [Jekyll](https://jekyllrb.com/) which works really well with GitHub Pages. I figured it would do just fine for my friend and I set about searching for a pretty theme. I wanted a theme with a _book-ish_ vibe. Unfortunately, most of the themes were too modern. Eventually, I caved and begun working on my own theme. With the help of [Poole](https://github.com/poole/poole), the Jekyll Butler, I was able to build **Tale**.
-
-## Contribute
-Feel free to create an issue or make a pull request on [GitHub](https://github.com/chesterhow/tale).
-
-Thanks for reading!
+[LinkedIn](https://www.linkedin.com/in/megan-verbakel-9173488b/) <br>
+[Github](https://github.com/MVerbakel)
