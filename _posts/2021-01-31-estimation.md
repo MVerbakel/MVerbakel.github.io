@@ -84,7 +84,7 @@ So based on this sample, we estimate the population mean is somewhere in the ran
 
 ## Complete Python code and formulas: estimating a population mean
 
-Note, if the population standard deviation isn't known and the sample size is small (<30), we can use the t-distribution to determine the critical value instead of z. Like the normal distribution, the t-distribution is symmetric and bell shaped, but it has heavier tails (more values at the extremes, so values far from the mean more common than for z). However, for large n the t-distribution becomes very close to the z distribution. Below I'll show how to use both methods in Python.
+Note, if the population standard deviation isn't known and the sample size is small (<30), we can use the t-distribution to determine the critical value instead of z. Like the normal distribution, the t-distribution is symmetric and bell shaped, but it has heavier tails (more values at the extremes, so values far from the mean more common than for z). However, for large n the t-distribution becomes very close to the z distribution, so it's a safe bet in general to pick t instead of z. Below I'll show how to use both methods in Python.
 
 ### Mean: using z distribution
 
@@ -176,12 +176,12 @@ sample = [1,0,1,1,0,0,0,0]
 sample_p = np.mean(sample)
 n = len(sample)
 alpha = 0.05
-critical_val = st.norm.ppf(1-alpha/2)
+conf = 1 - (alpha / 2)
+critical_val = st.norm.ppf(conf)
 
 se = np.sqrt(sample_p*(1-sample_p)/n)
 ci_lower, ci_upper = sample_p - critical_val*se, sample_p + critical_val*se 
-
-print('95% CI = ({:.2f}, {:.2f})'.format(ci_lower, ci_upper))
+print('95% CI (using z) = ({:.2f}, {:.2f})'.format(ci_lower, ci_upper))
 
 nr_successes = np.sum(sample)
 nr_trials = len(sample)
@@ -201,7 +201,7 @@ print('95% CI using statsmodels = ({:.2f}, {:.2f})'.format(sm_ci_lower, sm_ci_up
 
 In the above examples we assumed the population distribution is normal, though they also works for other distributions if the sample is relatively large (based on CLT). However, bootstrapping is an alternative approach that makes no assumptions about the distribution. Instead, we simulate multiple experiments by resampling multiple times from the original sample (randomly selecting the same n each time, with replacement). For each new sample we calculate the statistic we are estimating (e.g. the mean), and save it. The distribution of these estimates gives us an estimate of the sampling distribution, and it's standard deviation is an estimate of the standard error. If the distribution is normal, we can simply use the percentiles to get a CI (e.g. 2.5th and 97.5th percentiles for a 95% CI):
 
-$$ \text{Percentile CI} = 100(\frac{\alpha}{2}), 100*1-(\frac{\alpha}{2}) $$
+$$ \text{Percentile CI} = 100*(\frac{\alpha}{2}), 100*1-(\frac{\alpha}{2}) $$
 
 However, if it's non-normal, we might over/underestimate the CI with this method, so it's better to use a bias-correcting method (e.g. BCa). Read more on this [here](https://www.frontiersin.org/articles/10.3389/fpsyg.2019.02215/full).
 
