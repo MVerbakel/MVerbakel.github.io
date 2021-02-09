@@ -163,7 +163,7 @@ t-statistic = 0.653, p-value = 0.522
 
 Alternatively, there are a number of statistical packages that can handle weights. E.g. the above is almost identical to the approach used in the package statsmodels.stats.weightstats:
 
-'''python
+```python
 from statsmodels.stats.weightstats import ttest_ind
 
 tstat, pval, dof = ttest_ind(test_sample_b['measurement'],
@@ -174,7 +174,7 @@ tstat, pval, dof = ttest_ind(test_sample_b['measurement'],
                             )
 
 print('t-statistic = {:.3f}, p-value = {:.3f}'.format(tstat, pval))
-'''
+```
 ```python
 t-statistic = 0.620, p-value = 0.543
 ```
