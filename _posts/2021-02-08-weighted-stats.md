@@ -74,5 +74,111 @@ Weighted variance = 1.812
 Weighted standard deviation = 1.346
 ```
 
-Reference: [Wikipedia](https://en.wikipedia.org/wiki/Weighted_arithmetic_mean#Weighted_sample_variance)
+### Weighted t-test
+
+We can now use our weighted mean and weighted standard deviation directly in a t-test, just remember n or nobs is sum(weights). Let's assume we have two samples (control and variant), and want to compare their weighted means (assuming both were equally impacted by the imbalance).
+
+#### Create a second sample
+
+For convenience, I'll just use the same data, but add some difference to the measurements.
+
+```python
+import pandas as pd
+import numpy as np
+
+target_proportion = 0.5
+
+test_sample_b = pd.DataFrame({'gender': ['male']*6 + ['female']*4,
+                              'gender_bin': [1]*6 + [0]*4,
+                              'measurement': [3.5]*4 + [1]*2 + [4.6]*4
+                              })
+
+male_prop_b = target_proportion / test_sample_b['gender_bin'].mean()
+female_prop_b = target_proportion / (1 - test_sample_b['gender_bin'].mean())
+
+test_sample_b['weights'] = test_sample_b['gender'].map(lambda x: female_prop_b if x=='female'
+                                                       else male_prop_b)
+```
+
+#### Calculate the weighted mean and standard deviation
+
+```python
+def weighted_statistics(values, weights):
+    """
+    values: numpy array of measurements
+    weights: numpy array of weights to apply to values (should be same length)
+    Returns: weighted mean, weighted standard deviation, and the sum of the weights
+    """
+    
+    sum_of_weights = sum(weights)
+    weighted_sum_of_values = np.dot(values.T, weights)
+    weighted_mean = weighted_sum_of_values / sum_of_weights
+    
+    diffs_from_mean = np.array([x-weighted_mean for x in values])
+    sum_squares = np.dot((diffs_from_mean**2).T, weights)
+    weighted_stddev = np.sqrt(sum_squares / sum_of_weights)
+    
+    return weighted_mean, weighted_stddev, sum_of_weights
+
+weighted_mean_a, weighted_stddev_a, sum_of_weights_a = weighted_statistics(values=np.array(test_sample_a['measurement']), 
+                                                                           weights=np.array(test_sample_a['weights'])
+                                                                          )
+
+weighted_mean_b, weighted_stddev_b, sum_of_weights_b = weighted_statistics(values=np.array(test_sample_b['measurement']), 
+                                                                           weights=np.array(test_sample_b['weights'])
+                                                                          )
+
+print('A: weighted mean = {:.3f}, weighted std dev = {:.3f}'.format(weighted_mean_a, weighted_stddev_a))
+print('B: weighted mean = {:.3f}, weighted std dev = {:.3f}'.format(weighted_mean_b, weighted_stddev_b))
+```
+```python
+A: weighted mean = 3.250, weighted std dev = 1.346
+B: weighted mean = 3.633, weighted std dev = 1.276
+```
+
+#### Apply Welch's t-test
+
+Ho: mean of A = mean of B
+Ha: mean of A != mean of B
+
+```python
+from scipy.stats import t
+
+mean_variances = [weighted_stddev_a**2/sum_of_weights_a, weighted_stddev_b**2/sum_of_weights_b]
+t_value = (weighted_mean_b - weighted_mean_a)/np.sqrt(sum(mean_variances))
+t_df = int( sum(mean_variances)**2 / 
+            ( ( mean_variances[0]**2 / (sum_of_weights_a - 1) ) 
+            + ( mean_variances[1]**2 / (sum_of_weights_b - 1) ) ) 
+            )  
+
+t_prob = t.cdf(abs(t_value), t_df)
+p_val = 2*(1-t_prob)
+print('t-statistic = {:.3f}, p-value = {:.3f}'.format(t_value, p_val))
+```
+```python
+t-statistic = 0.653, p-value = 0.522
+```
+
+#### Alternative
+
+Alternatively, there are a number of statistical packages that can handle weights. E.g. the above is almost identical to the approach used in the package statsmodels.stats.weightstats:
+
+'''python
+from statsmodels.stats.weightstats import ttest_ind
+
+tstat, pval, dof = ttest_ind(test_sample_b['measurement'],
+                             test_sample_a['measurement'],
+                             usevar='unequal',
+                             weights=(test_sample_b['weights'], test_sample_a['weights']),
+                             alternative='two-sided'
+                            )
+
+print('t-statistic = {:.3f}, p-value = {:.3f}'.format(tstat, pval))
+'''
+```python
+t-statistic = 0.620, p-value = 0.543
+```
+
+
+References: [Wikipedia](https://en.wikipedia.org/wiki/Weighted_arithmetic_mean#Weighted_sample_variance), [statsmodels](https://www.statsmodels.org/stable/_modules/statsmodels/stats/weightstats.html)
 
