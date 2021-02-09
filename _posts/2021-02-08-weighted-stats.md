@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Weighted statistics"
+title: "Weighted statistics and t-test"
 mathjax: true
 ---
 
@@ -140,7 +140,7 @@ B: weighted mean = 3.633, weighted std dev = 1.276
 
 #### Apply Welch's t-test
 
-Ho: mean of A = mean of B
+Ho: mean of A = mean of B <br>
 Ha: mean of A != mean of B
 
 ```python
