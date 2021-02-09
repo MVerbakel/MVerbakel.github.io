@@ -4,7 +4,7 @@ title: "Weighted statistics"
 mathjax: true
 ---
 
-Sometimes the sample data we have doesn't represent the population well. For example, maybe you run a survey and the response rate is higher for males than females. If the variables we want to analyse differ by the unbalanced groups (e.g. gender), then all our summary statistics will be biased. To correct this we can use weighting.
+Sometimes the sample data we have doesn't represent the population well. For example, maybe you run a survey and the response rate is higher for males than females. If the variables we want to analyse differ by the unbalanced groups (e.g. gender), then all our summary statistics will be biased. If we know the desired proportions for the groups (e.g. based on population data), we can use weighting to correct this.
 
 ### Create sample
 
@@ -37,7 +37,7 @@ Male weight = 0.83, female weight = 1.25
 
 ### Weighted mean
 
-The weighted mean is just the values multiplied by the weights, and divided by the sum of the weights:
+The weighted mean is the values multiplied by the weights, and divided by the sum of the weights. By weighting the results, we reduce the effect of the males on the average and increase the effect of the females, rebalancing them so that the end the result is the same as if we had the correct proportion of observations in each group. Note, we're assuming the samples are representative of the male/female populations (i.e. we're not correcting for other biases, e.g. self-selection bias in the case of surveys). 
 
 $$ \bar{x}_\text{weighted} = \frac{\sum\limits_{i=1}^n (x_iw_i)}{\sum\limits_{i=1}^n(w_i)}$$
 
@@ -57,9 +57,11 @@ Weighted mean = 3.250
 
 ### Weighted variance & standard deviation
 
-For the variance we want to compare the actual values to the corrected mean (weighted mean), and then we can weight the squared differences and divide by the sum of weights to get their average with the correct proportions. 
+For the variance we want to compare the actual values to the corrected mean (weighted mean), then weight the squared differences and divide by the sum of weights to get the corrected average. 
 
 $$ \hat\sigma^2_w = \frac{\sum\limits_{i=1}^n w_i(x_i - \mu^*)^2}{\sum\limits_{i=1}^n(w_i)}$$
+
+Thinking this through it makes sense, the weighted mean is the 'correct mean' so we want to know the deviation of the values from that. Then we weight the deviations so that the effect of the male observations on the average is reduced as before. 
 
 ```python
 squared_diffs = np.array([(x - weighted_mean)**2 for x in test_sample['measurement']])
