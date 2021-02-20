@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Estimation: standard errors and confidence intervals<br>"
+title: "Population estimates: one sample standard errors and confidence intervals<br>"
 mathjax: true
 ---
 
@@ -199,7 +199,7 @@ print('95% CI using statsmodels = ({:.2f}, {:.2f})'.format(sm_ci_lower, sm_ci_up
 
 ## Bootstrapping: a universal approach
 
-In the above examples we assumed the population distribution is normal, though they also works for other distributions if the sample is relatively large (based on CLT). However, bootstrapping is an alternative approach that makes no assumptions about the distribution. Instead, we simulate multiple experiments by resampling multiple times from the original sample (randomly selecting the same n each time, with replacement). For each new sample we calculate the statistic we are estimating (e.g. the mean), and save it. The distribution of these estimates gives us an estimate of the sampling distribution, and it's standard deviation is an estimate of the standard error. If the distribution is normal, we can simply use the percentiles to get a CI (e.g. 2.5th and 97.5th percentiles for a 95% CI):
+In the above examples we assumed the population distribution is normal, though they would also work for many other distributions if the sample is relatively large (based on CLT). However, bootstrapping is an alternative approach that makes no assumptions about the distribution. Instead, we simulate multiple experiments by resampling multiple times from the original sample (randomly selecting the same n each time, with replacement). For each new sample we calculate the statistic we are estimating (e.g. the mean), and save it. The distribution of these estimates gives us an estimate of the sampling distribution, and it's standard deviation is an estimate of the standard error. If the distribution is normal, we can simply use the percentiles to get a CI (e.g. 2.5th and 97.5th percentiles for a 95% CI):
 
 $$ \text{Percentile CI} = 100*(\frac{\alpha}{2}), 100*1-(\frac{\alpha}{2}) $$
 

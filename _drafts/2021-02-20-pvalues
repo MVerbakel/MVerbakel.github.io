@@ -1,0 +1,18 @@
+---
+layout: post
+title: "What is a p value?"
+mathjax: true
+---
+
+
+Some confuse the p-value as relating to the probability the null or alternate are true, but remember it's conditioned on the null hypothesis being true:
+
+$$ p value = P(\text{observed difference} \:|\: H_\text{o} true)$$
+
+For example, to calculate the probability the null hypothesis is true, given some observed difference, we also need the probability the null hypothesis is true:
+
+$$ P( H_\text{o}\:\text{true}  \:|\: \text{observed difference}) = \frac{P(\text{observed difference} \:|\: H_\text{o}\:\text{true}) * P(H_\text{o}\:\text{true})}{P(\text{observed difference})} $$
+
+$$ = \frac{P(H_\text{o} true)}{P(\text{observed difference})} * pvalue $$
+
+<br>
