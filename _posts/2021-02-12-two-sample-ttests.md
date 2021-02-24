@@ -27,6 +27,8 @@ Alternatively, a one-sided test would look something like:
 
 The level of significance (alpha), is the acceptable false positive rate. A common choice is 0.05, which means we expect our test to incorrectly reject the null hypothesis 1/20 times on average (i.e. we conclude there's sufficient evidence the means are not equal, when there's actually no difference). The other 95% of the time, we expect to correctly accept the null. The smaller the alpha selected, the larger the sample needed. It's common to see a larger alpha such as 0.1 in business settings (where more risk is tolerated), and a smaller alpha such as 0.01 in medical settings. Note, there is no significance level that is correct 100% of the time, we always have to trade-off the probability of a false positive, with having enough power to detect an effect when it exists.
 
+If it's a two sided test, we test whether the difference is positive or negative (both directions). In this case we divide alpha by 2 (e.g. for p=0.05, we use 0.025 on each side), and the result is significant if it's in the top or bottom 2.5%. For a one-tailed test we put the full 0.05 in one tail and so the result is significant if it's in that 5%.
+
 **Step 3: Test statistic** <br>
 
 Below we will discuss the specifics, but this is essentially calculating the standardised difference between the two groups (relative to the variation in the data). We can then look at the sampling distribution under the null to determine how common a value like this (or larger) is, when the null hypothesis is true.
@@ -112,36 +114,44 @@ Welch's t-test is an adaptation of the t-test which is more reliable when the va
 
 $$ t = \frac{\bar{x_1} - \bar{x_2}}{\sqrt{\frac{s_1^2}{n1} + \frac{s_2^2}{n2}}}$$
 
+The degrees of freedom to calculate the probability the t value is less than the critical value:
+
+$$dof = \frac
+{(\frac{s_\text{x1}^2}{n1} + \frac{s_\text{x2}^2}{n2})^2}{\frac{s_\text{x1}^4}{n1^2*(n1-1)} + \frac{s_\text{x2}^4}{n2^2*(n2-1)}} $$
+
+Where:
+- $$\bar{x_1}$$, $$\bar{x_2}$$ are the sample means,
+- n1,n2 are the sample sizes 
+- $$s_\text{x1}^2$$, $$s_\text{x2}^2$$ are the sample variances, and $$s_\text{x1}^4$$, $$s_\text{x2}^4$$ are the squared sample variances.
+
 ```python
 from scipy.stats import t
 
-def welch_t_test(avg_base, avg_var, stdev_base, stdev_var, obs_base, obs_var, two_tailed = True):
+def welch_t_test(avg_group1, variance_group1, n_group1, 
+                 avg_group2, variance_group2, n_group2, two_tailed = True):
     """
-    Runs Welch's test to determine if the average value of a metric differs between base and variant.
-    avg_base: Mean value of metric in base (control group)
-    avg_var: Mean value of metric in variant (test group)
-    stdev_base: Standard deviation of the metric in base
-    stdev_var: Standard deviation of the metric in variant
-    obs_base: Sample size of base
-    obs_var: Sample size of variant
-    Returns: p value from the test
+    Runs Welch's test to determine if the average value of a metric differs 
+    between two independent samples.
+    Returns: t value, p value
     """
-
-    mean_variances = [stdev_base**2/obs_base, stdev_var**2/obs_var]
     
-    t_value = (avg_var - avg_base) / np.sqrt(sum(mean_variances))
+    mean_difference = avg_group2 - avg_group1
+    mean_variance_group1 = variance_group1/n_group1
+    mean_variance_group2 = variance_group2/n_group2
+    
+    se =  np.sqrt(mean_variance_group1 + mean_variance_group2)
+    t_value = mean_difference / se
 
-    t_df = int(sum(mean_variances)**2 / 
-               (( mean_variances[0]**2 / (obs_base - 1)) 
-               + (mean_variances[1]**2 / (obs_var - 1) )) 
-              )
+    dof_numer = (mean_variance_group1 + mean_variance_group2)**2
+    dof_denom = ((mean_variance_group1)**2 / (n_group1-1)) + ((mean_variance_group2)**2 / (n_group2-1))
+    dof = dof_numer / dof_denom
     
     if two_tailed:
-        t_prob = t.cdf(abs(t_value), t_df)
+        t_prob = t.cdf(abs(t_value), dof)
         return t_value, 2*(1-t_prob)
 
     else:
-        t_prob = t.cdf(t_value, t_df)
+        t_prob = t.cdf(t_value, dof)
         return t_value, 1-t_prob
 ```
 
@@ -174,4 +184,4 @@ We've covered three common tests for comparing the means of two independent samp
 - Given they assume the means follow normal distributions, larger samples are required for skewed and non-normal distributions (based on CLT, they will eventually converge). Before applying these tests, the metrics should be validated. You may also want to consider methods to improve the power e.g. variance reduction via regression adjustment.
 - Outliers: extreme values far from the mean will explode the variance in the denominator, causing the t statistic to become very small and decreasing the power. One option is to winsorize the values first (capping at some percentile). 
 
-References: https://en.wikipedia.org/wiki/Student%27s_t-test#Independent_two-sample_t-test
+References: [Wikipedia](https://en.wikipedia.org/wiki/Student%27s_t-test#Independent_two-sample_t-test)
