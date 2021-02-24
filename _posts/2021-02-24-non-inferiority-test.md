@@ -4,9 +4,7 @@ title: "Non-inferiority testing"
 mathjax: true
 ---
 
-Non-inferiority tests are just one-sided tests with a margin. They're commonly used in experiments for guardrail metrics, e.g. for web experiments where we need to make sure we're not hurting the load time as we add new features. 
-
-The main difference to a normal one-sided test is the hypothesis test:
+Non-inferiority tests are just one-sided tests with a margin. They're commonly used in experiments for guardrail metrics, e.g. for web experiments where we need to make sure we're not hurting the load time as we add new features. The main difference to a normal one-sided test is the hypothesis test:
 
 **If high values are good:**
 
@@ -23,6 +21,8 @@ In this case rejecting the null hypothesis implies that the mean is less than th
 - Ha: mean 2 < mean1 - threshold or equivelantly mean2-mean1 < -threshold
 
 ### Python function:
+
+Note, we shift the base mean to allow some gap (subtracting the threshold), then it's just a  standard one-sided t-test comparing it to the second group mean. We don't need to make any adjustment to the standard deviation.
 
 ```python
 from scipy.stats import ttest_ind_from_stats
@@ -62,8 +62,6 @@ def non_inferiority_ttest(mean1, stddev1, n1, mean2, stddev2, n2, relative_diffe
 ```
 
 ### Example: Increase is good, threshold is 0.1 (10%). 
-
-We subtract the threshold from the base mean so we can do a standard one-sided t-test comparing it to the second group mean (i.e. we allow some gap):
 
 Ho: mean2 >= mean1 - mean1*0.1 
 
