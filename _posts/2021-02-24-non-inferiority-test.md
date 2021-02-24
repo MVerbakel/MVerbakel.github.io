@@ -4,7 +4,7 @@ title: "Non-inferiority testing"
 mathjax: true
 ---
 
-Non-inferiority tests are just one-sided tests with a margin. They're commonly used in experiments for guardrail metrics, e.g. for web experiments where we need to make sure we're not hurting the load time as we add new features. The main difference to a normal one-sided test is the hypothesis test:
+Non-inferiority tests are just one-sided tests with a margin. They're commonly used in experiments for guardrail metrics, e.g. when we don't need to show an improvement but just want to make sure a change is not 'hurting' things.  For example, in web experiments a common guardrail is the site speed (we want to add features, but not at the cost of slowing the site). The main difference to a normal one-sided test is the hypothesis test:
 
 **If high values are good:**
 
