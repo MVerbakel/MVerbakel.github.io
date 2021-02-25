@@ -4,9 +4,13 @@ title: "Non-inferiority testing:<br>t-test with a margin"
 mathjax: true
 ---
 
-Non-inferiority (or superiority) tests are just one-sided tests with a margin, but they're pretty useful in experimentation. For example, let's say you're adding a new feature to your web shop. You're primarily interested in increasing revenue, but at the same time you don't want to hurt other metrics like the average page load time, or volume of customer service queries. Metrics that you just want to keep an eye on like this are sometimes called 'guardrails'. For these we can use a one-sided test with a margin to check if the difference exceeds some acceptable threshold. If we conclude the difference exceeds the threshold, the new change is inferior to the current, and if not, it's non-inferior.
+Non-inferiority (or superiority) tests are just one-sided tests with a margin, but they're pretty useful in experimentation. For example, let's say you're adding a new feature to your web shop. You're primarily interested in increasing revenue, but at the same time you don't want to hurt other metrics like the average page load time, or volume of customer service queries. Metrics that you just want to keep an eye on like this are sometimes called 'guardrails'. 
 
-Like with all hypothesis tests, it's impossible to prove there is no effect. Instead, we test whether the difference is not worse than some meaningful threshold. For example, we may be ok with some increase in customer service volumes (particularly if it may be temporary), but decide anything above 5% is too high a cost. In this case 5% will be our threshold, and we'll test whether the change exceeds this or not. Depending on the direction of 'good', this gives us the following hypotheses (using a t-test on two independent samples as an example):
+Like with all hypothesis tests, it's impossible to prove there is no effect. Instead, we test whether the difference is not worse than some meaningful acceptable threshold. If we conclude the difference exceeds the threshold, the new change is inferior to the current, and if not, we can call it non-inferior. For example, we may be ok with some increase in customer service volumes (particularly if it may be temporary), but decide anything above 5% is too high a cost. In this case 5% will be our threshold, and we'll test whether the change exceeds this or not. However, keep in mind your test should be appropriately powered to avoid missing large negative effects.
+
+### Hypothesis
+
+ Depending on the direction of 'good', this gives us the following hypotheses (using a t-test on two independent samples as an example):
 
 **If high values are good:**
 
