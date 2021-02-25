@@ -4,33 +4,36 @@ title: "Non-inferiority testing:<br>t-test with a margin"
 mathjax: true
 ---
 
-Non-inferiority (or superiority) tests are just one-sided tests with a margin, but they're pretty useful in experimentation. For example, let's say you're adding a new feature to your web shop. You're primarily interested in increasing revenue, but at the same time you don't want to hurt other metrics like the average page load time, or volume of customer service queries. Metrics that you just want to keep an eye on like this are sometimes called 'guardrails'. 
+Non-inferiority tests are just one-sided tests with a margin, but they're pretty useful in experimentation. For example, let's say you're adding a new feature to your web shop. You're primarily interested in increasing revenue, but at the same time you don't want to hurt other metrics like the average page load time, or volume of customer service queries. Metrics that you just want to keep an eye on like this are sometimes called 'guardrails'. For these metrics, we want to make sure the new version of the site is not worse (non-inferior) to the current.
 
-Like with all hypothesis tests, it's impossible to prove there is no effect. Instead, we test whether the difference is not worse than some meaningful acceptable threshold. If we conclude the difference exceeds the threshold, the new change is inferior to the current, and if not, we can call it non-inferior. For example, we may be ok with some increase in customer service volumes (particularly if it may be temporary), but decide anything above 5% is too high a cost. In this case 5% will be our threshold, and we'll test whether the change exceeds this or not. However, keep in mind your test should be appropriately powered to avoid missing large negative effects.
+Like with all hypothesis tests, it's impossible to prove there is no effect. Instead, we test whether the difference is not worse than some meaningful acceptable threshold. If we conclude the difference exceeds the threshold, the new change is inferior to the current, and if not, we can call it non-inferior. For example, we may be ok with some increase in customer service volumes (particularly if it may be temporary), but decide anything above 5% is too high a cost. In this case 5% will be our threshold, and we'll test whether the change exceeds this or not. 
 
 ### Hypothesis
 
  Depending on the direction of 'good', this gives us the following hypotheses (using a t-test on two independent samples as an example):
 
-**If high values are good:**
+**If high values are good: (e.g. revenue or number of purchases per visitor)**
 
-In this case rejecting the null hypothesis implies that the mean is greater than the base group by at least the threshold (for superiority).
+In this case rejecting the null hypothesis implies that the variant mean is greater than the control mean minus the threshold. In other words, we allow some margin for the variant (group 2) to be worse than the control (group 1). As long as the difference is above the threshold, we conclude it's non-inferior:
 
-- Ho: mean2 <= mean1 + threshold or equivelantly mean2-mean1 <= threshold
-- Ha: mean 2 > mean1 + threshold or equivelantly mean2-mean1 > threshold
+- Ho: mean2-mean1 <= threshold OR equivelantly mean 2 <= mean1 - threshold
+- Ha: mean2-mean1 > threshold OR equivelantly mean 2 > mean1 - threshold (non-inferior)
 
-**If high values are bad:**
+**If high values are bad: (e.g. average page load time or customer service tickets)**
 
-In this case rejecting the null hypothesis implies that the mean is less than the base group by at least the threshold.
+In this case, rejecting the null hypothesis implies the variant mean (group 2) is less than the control mean (group 1) plus the threshold. Again, we allow some negative impact by adding the threshold on top of the control mean.
 
-- Ho: mean2 >= mean1 - threshold or equivelantly mean2-mean1 >= -threshold
-- Ha: mean2 < mean1 - threshold or equivelantly mean2-mean1 < -threshold
+- Ho: mean2-mean1 >= threshold OR equivelantly mean2 >= mean1+threshold 
+- Ha: mean2-mean1 < threshold OR equivelantly mean2 < mean1+threshold  (non-inferior)
 
-Note, for experiments mean 1 would be the base or control group, and mean2 would be the treatment group.
+- Ho: mean2 >= mean1 - threshold or equivelantly mean2-mean1 >= -threshold (inconclusive)
+- Ha: mean2 < mean1 - threshold or equivelantly mean2-mean1 < -threshold (not inferior)
+
+![Non inferiority example](/assets/non_inferiority.png)
 
 ### Python function:
 
-Note, we shift the base mean to allow some gap (subtracting the threshold), then it's just a standard one-sided t-test comparing it to the second group mean. 
+Note, the statistical tests remain the same (one-sided ttest in this case). We simply shift the base mean to allow some gap (subtracting the threshold) in order to change the null hypothesis.
 
 ```python
 from scipy.stats import ttest_ind_from_stats
@@ -100,6 +103,10 @@ One sided ttest: t value = 1.3677, pval = 0.0865
 ```
 
 ### Notes
+- Keep in mind: non-inferior does not mean equivelant or superior, and inconclusive does not mean inferior (it could be inferior as the CI overlaps with the margin, but also may not be).
+- Setting the margin based on the relative (% difference from group 1) is preferred as an absolute margin could be reliant on the pre-experiment estimate of the mean in the control being correct ([reference](https://www.sciencedirect.com/science/article/pii/S0735109717379275)).
+- If you have trouble deciding the threshold, consider what size change would you celebrate if it was the primary metric for the experiment? Or perhaps, what is the cost of hurting this metric, and when would that cost be too high?
+- Make sure your test is sufficiently powered.
+- However, you still need to watch out for the cascading losses issue. Over time, experiments with a small negative effect (within the margin) can accumulate, causing a much larger negative impact. This is an issue with all experiments, but of particular concern given we allow a margin in non-inferiority tests.
 - You could also do a two-sided test and estimate the effect (checking if the estimate is above or below the threshold), but this will require a larger sample. 
 - I've shown the non-inferiority approach for a two sample ttest, but the concept works equally well for other metrics and tests (e.g. proportions, or the mann-whitney rank test).
-- If you have trouble deciding the threshold, consider what size change would you celebrate if it was the primary metric for the experiment? Or perhaps, what is the cost of hurting this metric, and when would that cost be too high?

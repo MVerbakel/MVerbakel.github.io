@@ -114,7 +114,7 @@ Welch's t-test is an adaptation of the t-test which is more reliable when the va
 
 $$ t = \frac{\bar{x_1} - \bar{x_2}}{\sqrt{\frac{s_1^2}{n1} + \frac{s_2^2}{n2}}}$$
 
-The degrees of freedom to calculate the probability the t value is less than the critical value:
+The degrees of freedom (used to determine the t-distribution and thus critical value):
 
 $$dof = \frac
 {(\frac{s_\text{x1}^2}{n1} + \frac{s_\text{x2}^2}{n2})^2}{\frac{s_\text{x1}^4}{n1^2*(n1-1)} + \frac{s_\text{x2}^4}{n2^2*(n2-1)}} $$
