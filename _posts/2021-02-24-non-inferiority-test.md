@@ -8,7 +8,7 @@ Non-inferiority tests are just one-sided tests with a margin, but they're pretty
 
 Like with all hypothesis tests, it's impossible to prove there is no effect. Instead, we test whether the difference is not worse than some meaningful acceptable threshold. If we conclude the difference exceeds the threshold, the new change is inferior to the current, and if not, we can call it non-inferior. For example, we may be ok with some increase in customer service volumes (particularly if it may be temporary), but decide anything above 5% is too high a cost. In this case 5% will be our threshold, and we'll test whether the change exceeds this or not. 
 
-### Hypothesis
+## Hypothesis
 
  Depending on the direction of 'good', this gives us the following hypotheses (using a t-test on two independent samples as an example):
 
@@ -26,12 +26,10 @@ In this case, rejecting the null hypothesis implies the variant mean (group 2) i
 - Ho: mean2-mean1 >= threshold OR equivelantly mean2 >= mean1+threshold 
 - Ha: mean2-mean1 < threshold OR equivelantly mean2 < mean1+threshold  (non-inferior)
 
-- Ho: mean2 >= mean1 - threshold or equivelantly mean2-mean1 >= -threshold (inconclusive)
-- Ha: mean2 < mean1 - threshold or equivelantly mean2-mean1 < -threshold (not inferior)
-
 ![Non inferiority example](/assets/non_inferiority.png)
+<br>
 
-### Python function:
+## Python function:
 
 Note, the statistical tests remain the same (one-sided ttest in this case). We simply shift the base mean to allow some gap (subtracting the threshold) in order to change the null hypothesis.
 
@@ -102,7 +100,7 @@ print('One sided ttest: t value = {:.4f}, pval = {:.4f}'.format(tstat, pval/2.0)
 One sided ttest: t value = 1.3677, pval = 0.0865
 ```
 
-### Notes
+## Notes
 - Keep in mind: non-inferior does not mean equivelant or superior, and inconclusive does not mean inferior (it could be inferior as the CI overlaps with the margin, but also may not be).
 - Setting the margin based on the relative (% difference from group 1) is preferred as an absolute margin could be reliant on the pre-experiment estimate of the mean in the control being correct ([reference](https://www.sciencedirect.com/science/article/pii/S0735109717379275)).
 - If you have trouble deciding the threshold, consider what size change would you celebrate if it was the primary metric for the experiment? Or perhaps, what is the cost of hurting this metric, and when would that cost be too high?
