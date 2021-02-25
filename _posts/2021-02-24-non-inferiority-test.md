@@ -6,20 +6,20 @@ mathjax: true
 
 Non-inferiority tests are just one-sided tests with a margin, but they're pretty useful in experimentation. For example, let's say you're adding a new feature to your web shop. You're primarily interested in increasing revenue, but at the same time you don't want to hurt other metrics like the average page load time, or volume of customer service queries. Metrics that you just want to keep an eye on like this are sometimes called 'guardrails'. For these metrics, we want to make sure the new version of the site is not worse (non-inferior) to the current.
 
-Like with all hypothesis tests, it's impossible to prove there is no effect. Instead, we test whether the difference is not worse than some meaningful acceptable threshold. For example, we may be ok with some increase in customer service volumes (particularly if it may be temporary), but decide anything above 5% is too high a cost. In this case 5% will be our threshold, and we'll test whether the change exceeds this or not. 
-
 ## Hypothesis
+
+Like with all hypothesis tests, it's impossible to prove there is no effect. Instead, we test whether the difference is not worse than some meaningful acceptable threshold. For example, we may be ok with some increase in customer service volumes (particularly if it may be temporary), but decide anything above 5% is too high a cost. In this case 5% will be our threshold, and we'll test whether the change exceeds this or not. 
 
  Depending on the direction of 'good', this gives us the following hypotheses (using a t-test on two independent samples as an example):
 
-**If high values are good: (e.g. revenue or number of purchases per visitor)**
+### If high values are good: (e.g. revenue or number of purchases per visitor)
 
 In this case rejecting the null hypothesis implies that the variant mean is greater than the control mean minus the threshold. In other words, we allow some margin for the variant (group 2) to be worse than the control (group 1). As long as the difference is above the threshold, we conclude it's non-inferior:
 
 - Ho: mean2-mean1 <= threshold OR equivelantly mean 2 <= mean1 - threshold
 - Ha: mean2-mean1 > threshold OR equivelantly mean 2 > mean1 - threshold (non-inferior)
 
-**If high values are bad: (e.g. average page load time or customer service tickets)**
+### If high values are bad: (e.g. average page load time or customer service tickets)
 
 In this case, rejecting the null hypothesis implies the variant mean (group 2) is less than the control mean (group 1) plus the threshold. Again, we allow some negative impact by adding the threshold on top of the control mean.
 
