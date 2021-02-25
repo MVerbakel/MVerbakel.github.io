@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Non-inferiority testing: t-test with a margin"
+title: "Non-inferiority testing:<br>t-test with a margin"
 mathjax: true
 ---
 
