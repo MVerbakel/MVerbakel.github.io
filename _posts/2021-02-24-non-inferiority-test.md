@@ -29,6 +29,8 @@ In this case, rejecting the null hypothesis implies the variant mean (group 2) i
 ![Non inferiority example](/assets/non_inferiority.png)
 <br>
 
+Note, in this illustration I'm showing a standard 2-sided confidence interval to build intuition. However, we actually will use a one-sided confidence interval (as we're only testing for a difference in one direction). Then we compare one end to the margin, while the other end goes to infinity. E.g. if higher values are better, we check if the lower end (left side) is greater than the threshold. If the lower end is greater than the threshold, it's significant (non-inferior). Inversely, if higher values are worse, we compare the upper end (right) to the margin. If the upper end is less than the threshold, it's significant (non-inferior).
+
 ## Python function:
 
 Note, the statistical tests remain the same (one-sided ttest in this case). We simply shift the base mean to allow some gap (subtracting the threshold) in order to change the null hypothesis.
@@ -104,7 +106,7 @@ One sided ttest: t value = 1.3677, pval = 0.0865
 - Keep in mind: non-inferior does not mean equivelant or superior, and inconclusive does not mean inferior (it could be inferior as the CI overlaps with the margin, but also may not be).
 - Setting the margin based on the relative (% difference from group 1) is preferred as an absolute margin could be reliant on the pre-experiment estimate of the mean in the control being correct ([reference](https://www.sciencedirect.com/science/article/pii/S0735109717379275)).
 - If you have trouble deciding the threshold, consider what size change would you celebrate if it was the primary metric for the experiment? Or perhaps, what is the cost of hurting this metric, and when would that cost be too high?
-- Make sure your test is sufficiently powered.
+- Make sure your test is sufficiently powered. If you're bounds are really wide and the result is not conclusive (can't rule out variant is inferior), the test was likely underpowered. You can rerun with a larger sample to get more confidence.
 - However, you still need to watch out for the cascading losses issue. Over time, experiments with a small negative effect (within the margin) can accumulate, causing a much larger negative impact. This is an issue with all experiments, but of particular concern given we allow a margin in non-inferiority tests.
 - You could also do a two-sided test and estimate the effect (checking if the estimate is above or below the threshold), but this will require a larger sample. 
 - I've shown the non-inferiority approach for a two sample ttest, but the concept works equally well for other metrics and tests (e.g. proportions, or the mann-whitney rank test).
