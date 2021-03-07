@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Weighted statistics and t-test"
+title: "Weighted statistics and the t-test"
 mathjax: true
 ---
 

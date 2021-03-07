@@ -1,10 +1,10 @@
 ---
 layout: post
-title: "Non-inferiority testing:<br>t-test with a margin"
+title: "Non-inferiority testing"
 mathjax: true
 ---
 
-Non-inferiority tests are just one-sided tests with a margin, but they're pretty useful in experimentation. For example, let's say you're adding a new feature to your web shop. You're primarily interested in increasing revenue, but at the same time you don't want to hurt other metrics like the average page load time, or volume of customer service queries. Metrics that you just want to keep an eye on like this are sometimes called 'guardrails'. For these metrics, we want to make sure the new version of the site is not worse (non-inferior) to the current.
+Non-inferiority tests are just one-sided tests with a margin. However, they're pretty useful in experimentation. For example, let's say you're adding a new feature to your web shop. You're primarily interested in increasing revenue, but at the same time you don't want to hurt other metrics like the average page load time, or volume of customer service queries. Metrics that you just want to keep an eye on like these are sometimes called 'guardrails'. For these metrics, we want to make sure the new version of the site is not worse (non-inferior) to the current, so we only need to test for changes in one direction.
 
 ## Hypothesis
 
@@ -103,6 +103,7 @@ One sided ttest: t value = 1.3677, pval = 0.0865
 ```
 
 ## Notes
+- It's generally advisable to do a two-sided test. Only do a non-inferiority if you truly only care about differences in one direction.
 - Keep in mind non-inferior does not mean equivelant or superior, and inconclusive does not mean inferior (it could be inferior as the CI overlaps with the margin, but also may not be).
 - Setting the margin based on the relative (% difference from group 1) is preferred as an absolute margin is reliant on the pre-experiment estimates being correct ([reference](https://www.sciencedirect.com/science/article/pii/S0735109717379275)).
 - If you're bounds are really wide and the result is not conclusive (can't rule out inferiority), the test was likely underpowered. You can rerun with a larger sample to get more confidence.
