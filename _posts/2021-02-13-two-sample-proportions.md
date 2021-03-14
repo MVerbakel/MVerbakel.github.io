@@ -91,24 +91,37 @@ $$\text{approximate CI} = \hat{p_1} - \hat{p_2} \pm Z_\text{critical} * \text{Wa
 
 ### Chi-square test of homogeneity
 
-An alternative to the z-test is the chi-square test. However, it's been shown that the 2x2 chi-square homogeneity test is equivelant to the z-test of two proportions (see [here](http://rinterested.github.io/statistics/chi_square_same_as_z_test.html)). 
+Another option is the chi-square test of homogeneity. The chi-square test takes the observed frequencies in a contingency table (crosstab of the outcome levels vs sample groups), and compares them to what we would expect to see if there was no difference (null hypothesis). In the case of an experiment, if the treatment had no effect, we expect to see the proportion in each outcome level approximately the same for both samples. Note, this is just one of the three types of comparison for the chi-square test: 1. goodness of fit for comparing an observed and theoretical distribution; 2. test of homogeneity (this one) to compare two or more groups on the same categorical variable; and, 3. test of independence two compare two variables. However, they all use the same math for the test-statistic.
 
 $$\chi^2 = \sum{\frac{(O_i - E_i)^2}{E_i}}$$
 
-**Expected count:** 
+Note, it's been shown that the 2x2 chi-square homogeneity test is equivelant to the z-test of two proportions (see [here](http://rinterested.github.io/statistics/chi_square_same_as_z_test.html)). However, the chi-square test can also handle cases with more than 2 levels in the outcome, or more than two populations.
+
+**Expected counts:** 
 
 The expected count for a cell is the joint probability of the groups * total count. E.g. If the joint probability is 0.3 and we have a sample of 100, then we expect 0.3*100=30 for that cell. Worked example:
 
-- The probability of annual subscriber + AUS (assuming independence) = P(status=AS, country=AUS) = P(AS)*P(AUS) = 25,006/250,000 * 24,963/250,000 = 624224778/62500000000 = 0.00999
-- We multiply this by the total count to get the expected count for status=AS & country=AUS = 250K * 624,224,778 / 62,500,000,000 = 2496.9
-- Pulling that together we see the expected count = (250,000 * 25,006 * 24,963) / (1 * 250,000 * 250,000), and we can cancel out at 250,000 in the numerator and denominator, leaving: 25,006*24,963 / 250,000.
-- In other words, the expected count simplifies to = count(AS) * count(AUS) / total count
+|  Group  | Yes |  No |  Total  |
+| ------- | --- |  -- |  -----  |
+| control | C_Y | C_N | C |
+| variant | V_Y | V_N | V |
+| totals  | Y | N | T |
 
-![Contingency table](/assets/contingency_table.png)
+Based on this we can calculate the expected counts:
+- Expected C_Y = E_C_Y = P(control) * P(Yes) * Total = C/T * Y/T * T = C*Y*T / 1*T*T = C*Y / T
+- Expected C_N = E_C_N = C*N / T
+- Expected V_Y = E_V_Y = V*Y / T
+- Expected V_N = E_V_N = V*N / T
 
 **Chi-square statistic:** 
 
-For each cell (combination of groups), calculate the squared difference between the observed and expected counts and divide by the expected to standardise = (observed-expected)^2/expected. Sum these values to get the Chi-square statistic.
+For each cell (combination of groups), calculate the squared difference between the observed and expected counts and divide by the expected to standardise = (observed-expected)^2/expected. Sum these values to get the Chi-square statistic. The larger the difference between the observed and expected, the larger the test-statistic. 
+
+The test statistic approximately follows the chi-square distribution under the null hypothesis. Therefore, we can compare our test value to the chi-square distribution (adjusting the shape based on the degrees of freedom calculation below), and estimate the probability of observing such a value (or larger) when the null is true (p-value). 
+
+$$\text{degrees of freedom} = (\text{nr rows} - 1) * (\text{nr columns} - 1)$$
+
+For a 2x2 table, the degrees of freedom = (2-1) * (2-1) = 1.
 
 **Python implementation:**
 
@@ -123,6 +136,77 @@ print('Chi-square statistic = {:.2f}'.format(chi2))
 print('p-value = {:.4f}'.format(p_val))
 ```
 
-### Alternatives
+**Assumptions**
 
-Finally, the [g-test](https://en.wikipedia.org/wiki/G-test) and [Fisher's exact](https://en.wikipedia.org/wiki/Fisher%27s_exact_test) test are more precise options. However, these converge with the chi-square test with large samples.
+- Samples are independent and randomly selected. Each observation fits in one and only one cell.
+- The expected counts should be 5 or more in at least 80% of the cells, and no cell has an expected count <1. If they are not, [Fisher's exact](https://en.wikipedia.org/wiki/Fisher%27s_exact_test) test is recommended (a more accurate version of this test). 
+
+### G-test
+
+Finally, the [g-test](https://en.wikipedia.org/wiki/G-test) is another alternative. The g-test is very similar to the chi-squares test, as the chi-squared test is actually an approximation of the g-test. As with the chi-square test, we take a contingency table, and calculate by how much the observed and expected values differ. The null hypothesis being that the proportions of the outcome levels are the same for both samples.
+
+**Expected counts:**
+
+The expected counts are calculated the same way as the chi-squared test above, but the test statistic is different.
+
+**G test statistic** (based on presentation by [Tilly](https://elem.com/~btilly/effective-ab-testing/)):
+
+For each cell we calculate the g-value and the g-statistic is the sum of these values times 2:
+
+$$g = 2 * \sum{O_i * \log{\frac{O_i}{E_i}}}$$
+
+**Python implementation:**
+
+```python
+from scipy.stats import chi2
+import numpy as np
+
+def g_test(n1, n2, successes_1, successes_2):
+    """
+    Performs a g-test comparing the proportion of successes in two groups.
+    Returns: test statistic, p value
+    """
+
+    failures_1 = n1 - successes_1
+    failures_2 = n2 - successes_2
+    total = n1 + n2
+
+    expected_control_success = n1 * (successes_1 + successes_2) / total
+    expected_control_failure = n1 * (failures_1 + failures_2) / total
+    expected_variant_success = n2 * (successes_1 + successes_2) / total
+    expected_variant_failure = n2 * (failures_1 + failures_2) / total
+
+    g1 = successes_1 * np.log(successes_1/expected_control_success)
+    g2 = failures_1 * np.log(failures_1/expected_control_failure)
+    g3 = successes_2 * np.log(successes_2/expected_variant_success)
+    g4 = failures_2 * np.log(failures_2/expected_variant_failure)
+
+    g_test_stat = 2 * (g1+g2+g3+g4)
+    pvalue = 1 - chi2.cdf(g_test_stat, 1)
+
+    return g_test_stat, pvalue
+```
+
+Alternatively, there's a scipy function:
+```python
+from scipy.stats import chi2_contingency
+
+g, p, dof, expctd = chi2_contingency(contingency_table, lambda_="log-likelihood", correction=False)
+
+print("g test statistic={:.4f}, dof={}, p-value={:.4f}".format(g, dof, p))
+```
+
+**Assumptions:**
+
+- Samples are independent and randomly selected. Each observation fits in one and only one cell.
+- All observed counts (cells) are at least 10. 
+
+**Yates Continuity Correction**
+
+Both the chi-square test and g-test err on the small side, so Yates suggested adjusting all observed values 0.5 towards the expected values. This improves accuracy slightly. Set correction=True in the scipy function above for this correction.
+
+### Final thoughts:
+
+- The z-test for two proportions is commonly used in business as samples are large. The-chi-squared test is also pretty common, but as noted, equivelant to the z-test in the 2x2 case.
+- Some argue the g-test is better as it's faster and has less assumptions than the z-test.
+- However, with large samples (>~10K), the results of the z-test, chi-squared test, and g-test will all converge. So it mostly comes down to the field/company in practice (choose whatever is familiar to most).  
