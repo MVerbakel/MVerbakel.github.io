@@ -55,7 +55,7 @@ Where 's' is the sample standard deviation, and the critical value 'z' is based 
 
 ### Summary
 
-Hopefully, you can see now that we're just taking the distance from the population mean (estimated by the mean of the sampling distribution), to the point at which we capture x% of the sample estimates. So reversing that thinking, this means if I now put that distance around each of my sample estimates, x% of the time it will overlap with the population mean. Hence, for a random sample with a 95% confidence interval, there's a 19/20 chance that this time my interval overlaps with the mean.
+Hopefully, you can see now that we're just taking the distance from the population mean (estimated by the mean of the sampling distribution), to the point at which we capture x% of the sample estimates. So reversing that thinking, this means if I now put that distance around each of my sample estimates, x% of the time it will overlap with the population mean. Hence, with a 95% confidence interval, there's a 19/20 chance a randomly chosen interval overlaps with the mean.
 
 ![Sampling distributions](/assets/sampling_dist_w_ci.png)
 
@@ -166,8 +166,8 @@ ci_lower = (n - 1) * sample_variance / stats.chi2.ppf(1 - alpha / 2, dof)
 
 Let's say we run an AB experiment where we take a random sample of 100 injured birds and split them 50/50 into two groups. Group A gets the regular food (control), and group B gets a new version with added vitamins that we think will speed up their average recovery time (measured in days). Now we observe the birds for a month and at the end calculate the average recovery time in each group. 
 
-Ho: muA = muB
-Ha: muA != muB
+- Ho: muA = muB
+- Ha: muA != muB
 
 #### Difference in means
 
