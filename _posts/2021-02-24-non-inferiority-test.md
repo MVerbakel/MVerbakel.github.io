@@ -103,9 +103,11 @@ One sided ttest: t value = 1.3677, pval = 0.0865
 ```
 
 ## Notes
-- It's generally advisable to do a two-sided test. Only do a non-inferiority if you truly only care about differences in one direction.
+- It's generally advisable to do a two-sided test. Only do a non-inferiority if you truly only care about differences in one direction (e.g. checking the change doesn't 'hurt' key business metrics).
 - Keep in mind non-inferior does not mean equivelant or superior, and inconclusive does not mean inferior (it could be inferior as the CI overlaps with the margin, but also may not be).
-- Setting the margin based on the relative (% difference from group 1) is preferred as an absolute margin is reliant on the pre-experiment estimates being correct ([reference](https://www.sciencedirect.com/science/article/pii/S0735109717379275)).
+- If you're CI doesn't overlap with zero, it might be tempting to interpret it as a two-sided test, concluding the effect is higher/lower in variant. However, this is incorrect. The one-sided confidence interval is only valid for the one-sided non-inferiority test (i.e. the CI of a two-sided test may or may not overlap with 0). Further, changing the hypothesis based on the result would also mean we lose the false positive rate and power gaurantees.
 - If you're bounds are really wide and the result is not conclusive (can't rule out inferiority), the test was likely underpowered. You can rerun with a larger sample to get more confidence.
+- If you're not sure about the traffic size or baseline for your metric pre-experiment, you could run the experiment for a short period before doing the power calculation. However, do not use this to decide the margin (acceptable cost). Your margin should be based on the cost or value of the change, and the estimated difference is unlikely to be accurate anyway in such a short period (will fluctuate).
+- Setting the margin based on the relative (% difference from group 1) is preferred as an absolute margin is reliant on the pre-experiment estimates being correct ([reference](https://www.sciencedirect.com/science/article/pii/S0735109717379275)).
 - Over time, experiments with a small negative effect (within the margin) can accumulate, causing a much larger negative impact (cascading losses). This is an issue with all experiments, but of particular concern given we allow a margin.
 - I've shown the non-inferiority approach for a t-test, but the concept works equally well for other metrics and tests (e.g. proportions, and mann-whitney test).

@@ -141,6 +141,7 @@ Where $$s_\text{x1}^4$$, $$s_\text{x2}^4$$ are the squared sample variances.
 
 ```python
 from scipy.stats import t
+import numpy as np
 
 def welch_t_test(avg_group1, variance_group1, n_group1, 
                  avg_group2, variance_group2, n_group2, two_tailed = True):
@@ -168,6 +169,20 @@ def welch_t_test(avg_group1, variance_group1, n_group1,
     else:
         t_prob = t.cdf(t_value, dof)
         return t_value, 1-t_prob
+
+np.random.seed(26)
+group1 = np.random.normal(46, 3, 100)
+group2 = np.random.normal(47, 3.5, 105)
+
+tstat, pval = welch_t_test(avg_group1=np.mean(group1), 
+                           variance_group1 = np.var(group1, ddof=1), 
+                           n_group1 = len(group1), 
+                           avg_group2=np.mean(group2), 
+                           variance_group2 = np.var(group2, ddof=1), 
+                           n_group2 = len(group2), 
+                           two_tailed = True)
+
+print('t value = {:.4f}, pval = {:.4f}'.format(tstat, pval))
 ```
 
 Using scipy function:

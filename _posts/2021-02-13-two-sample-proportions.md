@@ -54,7 +54,7 @@ def z_test_2_sample_proportions(x1, x2, n1, n2, two_tailed=True):
     '''
     avg_p = (x1 + x2) / (n1 + n2)
     z_val = (x1/n1 - x2/n2) / np.sqrt(avg_p * (1-avg_p) * (1/n1 + 1/n2))
-    z_prob = dist.norm.cdf(-np.abs(test_stat))
+    z_prob = dist.norm.cdf(-np.abs(z_val))
 
     if two_tailed:
         return z_val, 2*z_prob
@@ -142,14 +142,15 @@ print('p-value = {:.4f}'.format(p_val))
 - The expected counts should be 5 or more in at least 80% of the cells, and no cell has an expected count <1. If they are not, [Fisher's exact](https://en.wikipedia.org/wiki/Fisher%27s_exact_test) test is recommended (a more accurate version of this test). 
 
 ### G-test
+(based on [Tilly, 2009](https://elem.com/~btilly/effective-ab-testing/), and [McDonald, 2014](http://www.biostathandbook.com/gtestind.html)):
 
-Finally, the [g-test](https://en.wikipedia.org/wiki/G-test) is another alternative. The g-test is very similar to the chi-squares test, as the chi-squared test is actually an approximation of the g-test. As with the chi-square test, we take a contingency table, and calculate by how much the observed and expected values differ. The null hypothesis being that the proportions of the outcome levels are the same for both samples.
+Finally, the [g-test](https://en.wikipedia.org/wiki/G-test) of independence is another alternative. The g-test is very similar to the chi-squared test, as the chi-squared test is actually an approximation of the g-test. As with the chi-square test, we take a contingency table, and calculate by how much the observed and expected values differ. The null hypothesis being that the proportions of the outcome levels are the same for both samples.
 
 **Expected counts:**
 
 The expected counts are calculated the same way as the chi-squared test above, but the test statistic is different.
 
-**G test statistic** (based on presentation by [Tilly](https://elem.com/~btilly/effective-ab-testing/)):
+**G test statistic:** 
 
 For each cell we calculate the g-value and the g-statistic is the sum of these values times 2:
 

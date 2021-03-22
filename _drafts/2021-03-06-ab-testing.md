@@ -21,3 +21,5 @@ Variance reduction: regression adjustment, cuped
 Robust SE
 Clustered SE
 
+
+Trimmed t
