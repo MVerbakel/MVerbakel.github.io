@@ -165,7 +165,7 @@ One of the other common statistics we want to estimate for a population is a pro
 
 $$ SE_\text{p} = \sqrt\frac{\hat{p}(1-\hat{p})}{n}$$
 
-$$ CI_\text{mean} = \hat{p} \pm z*SE_\text{p} $$
+$$ CI_\text{p} = \hat{p} \pm z*SE_\text{p} $$
 
 ```python
 import numpy as np

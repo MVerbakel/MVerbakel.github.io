@@ -47,6 +47,8 @@ $$ p value = P(\text{observed difference} \:|\: H_\text{o} true)$$
 
 ## Parametric tests for difference in means (assumed distribution):
 
+In general these tests are just comparing the signal (estimated difference) to the noise (variation in the sample). The sample size is important here because a given variance is "noiser" in a small sample then it is in a large sample. More formally, the sampling distribution will become tighter around the true difference as the sample sizes increase (meaning a lower standard error).
+
 General notation:
 - $$\bar{x_1}$$, $$\bar{x_2}$$ are the sample means
 - n1,n2 are the sample sizes 
@@ -311,6 +313,7 @@ Two sided Mann-Whitney test: U value = 12.8028, pval = 0.0000
 ## Final thoughts:
 
 - For parametric tests, you should validate your metrics at least once before applying them to make sure the results are valid. See [here](https://www.microsoft.com/en-us/research/group/experimentation-platform-exp/articles/p-values-for-your-p-values-validating-metric-trustworthiness-by-simulated-a-a-tests/) for more details on how to do this. 
+- If you're results are not significant, it could be: 1) the effect (signal) is not large enough; 2) the variance is too high (noise), which is why it's always good to also plot the distributions (checking for skew, outliers etc.); or, 3) the sample was too small (under-powered).
 - We assume for all these tests that the observations are sampled independently (i.e. each observation is independent of the others): they don't influence each other, each is counted only once, and each is only given one treatment. Some examples where this might not be true: 
     - 1) if is there is some kind of relationship between the customers (e.g. friends and family, who might discuss the treatment and influence each others outcomes); 
     - 2) if you can't be certain that each customer is unique (e.g. tracking by http cookie which could be refreshed, bots, or tracking by different IDs per device with multi-device users); and, 

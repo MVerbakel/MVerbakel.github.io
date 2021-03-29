@@ -45,7 +45,7 @@ The confidence interval is actually just a summary of the sampling distribution.
 
 $$ SE_\text{mean} = \frac{\sigma}{\sqrt{n}}$$
 
-- **2) The confidence interval (CI):** The sampling distribution tells us the proportion of values within x standard deviations. E.g. for a 95% two-sided confidence interval, 95% of the sample estimates will fall between the 2.5th and 97.5th percentile (alpha=5%, split either side). Which is equivelant to z=1.96 (standard deviations from the mean). Therefore, placing this distance around the sample estimate gauarantees it should include the population value (the center), for 95% of the sample estimates.
+- **2) The confidence interval (CI):** The sampling distribution tells us the proportion of values within x standard deviations. E.g. for a 95% two-sided confidence interval, 95% of the sample estimates will fall between the 2.5th and 97.5th percentile (alpha=5%, split either side). Which is equivelant to z=1.96 (standard deviations from the mean). Therefore, we just need to calculate the standard deviation for the sampling distribution (standard error), and take x multiples depending on how much coverage of the samples we want. Placing this resulting distance around each sample estimate in the distribution, this gauarantees the interval will include the population value (the center), for x% of the sample estimates (95% in the case of z=1.96).
 
 $$ \text{Margin of error} = \text{critical value} * SE = z \frac{s}{\sqrt{n}} $$
 
@@ -110,7 +110,7 @@ One of the other common statistics we want to estimate for a population is a pro
 
 $$ SE_\text{p} = \sqrt\frac{\hat{p}(1-\hat{p})}{n}$$
 
-$$ CI_\text{mean} = \hat{p} \pm z*SE_\text{p} $$
+$$ CI_\text{p} = \hat{p} \pm z*SE_\text{p} $$
 
 ```python
 import numpy as np
@@ -417,9 +417,9 @@ For metrics that are actually the ratio of two variables, we need to estimate th
 - 1) Calculating a CI for the percentage difference instead of the absolute difference (e.g. percentage change in average spend). The percentage is sometimes easier to interpret and compare than the absolute difference (e.g. 10% increase is clear, whereas a $5 difference requires you to check the baseline to decide if it's large).
 - 2) Calculating a CI for a ratio where the denominator is not the unit of randomisation (e.g. clicks/views when the experiment randomised visitors). In this case the observations are not independent.
 
-#### Fieller's method for percentage change
+#### Fieller's method (example for percentage change)
 
-The variance of the difference variance(meanA - meanB) is simply variance(meanA) + variance(meanB). However, the variance of the percentage difference = variance((meanB-meanA)/meanA) = variance(meanB/meanA), which is a ratio metric. Given the two means come from normal distributions, they are jointly bivariate normal, and the ratio is also normally distributed.   
+The variance of the difference, variance(meanA - meanB), is simply variance(meanA) + variance(meanB). However, the variance of the percentage difference = variance((meanB-meanA)/meanA) = variance(meanB/meanA), which is a ratio metric. Given the two means come from normal distributions, they are jointly bivariate normal, and the ratio is also normally distributed.   
 
 Fieller's theorem gives an approximate confidence interval for a ratio of means:
 
@@ -481,7 +481,7 @@ References:
 
 #### Delta method:
 
-The other common option is the delta method (also known as Taylor method), which uses a linear approximation for the estimates making it simpler to calculate a CI.
+The other common option is the delta method (also known as Taylor's method), which uses a linear approximation for the estimates making it simpler to calculate a CI. Though Fieller's method is better for small samples, the Delta method is simpler to implement.  
 
 Given two independent means x_c and x_t (control and treatment), the variance is estimated as:
 
@@ -490,6 +490,7 @@ $$variance(\%\Delta) = \frac{1}{\hat{x_c}^2} * var(\hat{x_t}) + \frac{\hat{x_t}^
 References:
 - Applying the Delta method in metric analytics: A practical guide with novel ideas ([Deng et al, 2018](https://www.researchgate.net/publication/323846161_Applying_the_Delta_method_in_metric_analytics_A_practical_guide_with_novel_ideas))
 - A Python implementation from that paper ([github](https://github.com/trangel/stats-with-python/blob/master/notebooks/delta%20method.ipynb))
+
 
 ## Bootstrap method
 
@@ -503,7 +504,7 @@ The downside of this method is that it can be slow, particularly if your working
 
 ### Final thoughts
 
-- The confidence interval measures the uncertainty of a sample statistic as an estimate for a population parameter. It's based on how much estimates would vary across repeated experiments (the sampling distribution).
+- The confidence interval measures the uncertainty of a sample statistic as an estimate for a population parameter (i.e. it's estimating the reliability of the estimation process). It's based on how much estimates would vary across repeated experiments (the sampling distribution).
 - An intuitive way to describe it is 'a range of plausible values'. We don't know where the population value lies within the interval, but we are reasonably confident it's somewhere within the bounds. If we are ok with the upper/lower bound being true, we can proceed with our action.
 - However, the population value is either within the interval or not. We can say with 95% confidence, if we repeat an experiment many times, the interval will contain the population value 95% of the time. The other 5% of the time, it's not in the interval at all. So the upper/lower bounds may not actually be the best/worst case scenario. 
 - This is to say, it's technically incorrect to describe the confidence as the probability a given CI contains the population value. It's a fixed value not a variable, and the pop. value is in it or not (i.e. probability is 0 or 100%). However, it's not uncommon to hear something like "we are 95% confident the interval includes the population mean". Just keep in mind this refers to the proportion of samples with repeated sampling.
