@@ -29,11 +29,11 @@ In this case, rejecting the null hypothesis implies the variant mean (group 2) i
 ![Non inferiority example](/assets/non_inferiority.png)
 <br>
 
-Note, in this illustration I'm showing a standard 2-sided confidence interval to build intuition. However, we actually will use a one-sided confidence interval (as we're only testing for a difference in one direction). 
+Note, here we're using one-sided confidence intervals (as we're only testing for a difference in one direction). 
 
 ## Python function:
 
-Note, the statistical tests remain the same (one-sided ttest in this case). We simply shift the base mean to allow some gap (subtracting the threshold) in order to change the null hypothesis.
+Note, the statistical tests remain the same (one-sided ttest in this case). We simply shift the base mean to allow some gap (subtracting/adding the threshold) in order to change the null hypothesis. 
 
 ```python
 from scipy.stats import ttest_ind_from_stats
@@ -42,15 +42,13 @@ import numpy as np
 def non_inferiority_ttest(mean1, stddev1, n1, mean2, stddev2, n2, relative_difference, equal_variance=False, increase_good=True):
     '''
     Perform a one-sided t-test with a non-inferiority threshold for two independent samples.
-    mean1: group 1 mean
-    stddev1: standard deviation of group 1
-    n1: number of observations in group 1
-    mean2: group 2 mean
-    stddev2: standard deviation of group 2
-    n2: number of observations in group 2
-    relative_difference: threshold as a percentage of the base group statistic (e.g. 0.1=10% difference)
-    equal_variance: if True, Welch's t-test
-    increase_good: if True, Ho: mean2 <= mean1 + threshold.
+    mean1/2: group mean
+    stddev1/2: standard deviation of each group
+    n1/2: number of observations in each group
+    relative_difference: threshold as a percentage of the base group (e.g. 0.1=10% difference)
+    equal_variance: if False, uses Welch's t-test.
+    increase_good: if True, Ho: mean2 <= mean1 - threshold. Else Ho: mean2 >= mean1 + threshold.
+    Returns: 
     '''
     
     delta = relative_difference * mean1
@@ -66,10 +64,14 @@ def non_inferiority_ttest(mean1, stddev1, n1, mean2, stddev2, n2, relative_diffe
                                        mean2=mean2, 
                                        std2=stddev2, 
                                        nobs2=n2, 
-                                       equal_var=False)
-    
-    return tstat, pval
+                                       equal_var=equal_variance)
 
+    if increase_good:
+        pvalue = pval/2.0
+    else:
+        pvalue = 1 - pval/2.0
+    
+    return tstat, pvalue
 ```
 
 ### Example: Increase is good, threshold is 0.1 (10%). 
@@ -96,14 +98,14 @@ tstat, pval = non_inferiority_ttest(mean1=mean_group1,
                                     equal_variance=False, 
                                     increase_good=True)
 
-print('One sided ttest: t value = {:.4f}, pval = {:.4f}'.format(tstat, pval/2.0))
+print('One sided ttest: t value = {:.4f}, pval = {:.4f}'.format(tstat, pval))
 ```
 ```python
 One sided ttest: t value = 1.3677, pval = 0.0865
 ```
 
 ## Notes
-- It's generally advisable to do a two-sided test. Only do a non-inferiority if you truly only care about differences in one direction (e.g. checking the change doesn't 'hurt' key business metrics).
+- It's generally advisable to do a two-sided test. Only do a non-inferiority if you truly only care about differences in one direction (e.g. checking the change doesn't 'hurt' key business metrics), and missing effects in the untested direction negligible.
 - Keep in mind non-inferior does not mean equivelant or superior, and inconclusive does not mean inferior (it could be inferior as the CI overlaps with the margin, but also may not be).
 - If you're CI doesn't overlap with zero, it might be tempting to interpret it as a two-sided test, concluding the effect is higher/lower in variant. However, this is incorrect. The one-sided confidence interval is only valid for the one-sided non-inferiority test (i.e. the CI of a two-sided test may or may not overlap with 0). Further, changing the hypothesis based on the result would also mean we lose the false positive rate and power gaurantees.
 - If you're bounds are really wide and the result is not conclusive (can't rule out inferiority), the test was likely underpowered. You can rerun with a larger sample to get more confidence.

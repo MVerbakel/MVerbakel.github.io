@@ -59,13 +59,26 @@ Hopefully, you can see now that we're just taking the distance from the populati
 
 ![Sampling distributions](/assets/sampling_dist_w_ci.png)
 
+### One vs two sided tests
+
+A two sided test checks both tails to assess the null hypothesis that the observed value differs to the hypothesised (e.g. mu 1 != mu 2). Whereas, in a one-sided test we state upfront the expected direction of the difference and only look in that direction (one tail). This means that with the same settings:
+
+- The one-tail p-value will be half the two-tail; and,
+- The two-tail p-value is twice the one-tail (assuming the predicted direction is correct).
+
+![One vs two-sided test](/assets/one_vs_two_sided.png)
+
+Similarly, for the confidence interval, the two-sided test will give bounds on both sides of the estimate. In contrast, as we're only interested in one direction, we only estimate one-side of the confidence interval (with the other side going to infinity).
+
+![One vs two-sided test](/assets/ci_by_tails.png)
+
 ## Calculations
 
 We have mostly worked with the example of estimating a population mean from one sample. Next we will walk through the confidence interval for different statistics, and also for differences between two samples (e.g. for AB experiments). 
 
 ### Confidence interval for one sample estimates:
 
-The below tests all assume the sample comes from a normal distribution, and the values are independent (don't influence each other). At the end I'll discuss some options for non-normal distributions.
+The below tests all assume the values are independent (don't influence each other) and randomly selected, and the estimate comes from a normal distribution. At the end I'll discuss some options for non-normal distributions.
 
 #### Mean (using t distribution)
 
@@ -171,7 +184,7 @@ Let's say we run an AB experiment where we take a random sample of 100 injured b
 
 #### Difference in means
 
-What is the difference in the average recovery time of group A and group B (muB-muA)? Assuming the observations are independent, and the distribution of the difference is normal (which we can validate with simulations), we can run a t-test and use the t distribution to compute a confidence interval around the difference estimate. 
+What is the difference in the average recovery time of group A and group B (muB-muA)? Assuming the observations are independent, and the distribution of the difference is normal (which we can validate with simulations), we can run a t-test and use the t distribution to compute a confidence interval around the difference estimate.
 
 **Using t-interval (assumes groups have equal variance)**
 
@@ -195,13 +208,16 @@ In general, the t-test is fairly robust to all but large deviations from these a
 import numpy as np
 from scipy.stats import t
 
-def ttest(group1, group2, two_tailed=True, alpha=0.05):
+def ttest(group1, group2, alternative='two-sided', alpha=0.05):
     '''
     Run two sample independent t-test
-    group 1, 2: numpy arrays for data in each group
-    two_tailed: if True, two sided test, else one-sided
+    group 1, 2: numpy arrays for data in each group (note, in AB testing, generally make group1 variant and group2 control so that the difference = variant - control).
+    alternative: 
+        - two_sided: two-tailed test (Ha:mu1!=mu2). Checks upper tail: is abs(t) > critical t, using 1-alpha/2.
+        - greater: one-tailed test (Ha:mu1>mu2). Checks upper tail: is t > critical t, using 1-alpha. 
+        - less: one-tailed test (Ha:mu1<mu2). Checks lower tail: is t < critical t, using alpha.
     alpha: false positive rate (1-alpha = confidence level)
-    returns: t value, p value, difference in means, confidence interval lower and upper
+    returns: t value, critical t value, p value, difference in means (group 1 - group 2), confidence interval lower and upper for the difference.
     '''
     
     n1 = len(group1)
@@ -209,32 +225,45 @@ def ttest(group1, group2, two_tailed=True, alpha=0.05):
     var_a = group1.var(ddof=1)
     var_b = group2.var(ddof=1)
     sp = np.sqrt(((n1-1)*var_a + (n2-1)*var_b) / (n1+n2-2))
+    df = n1 + n2 - 2
     mean_diff = group1.mean() - group2.mean()
     t_value = mean_diff / (sp * np.sqrt(1/n1 + 1/n2))
-    df = n1 + n2 - 2
     
-    if two_tailed:
+    if alternative == 'two-sided':
         t_prob = t.cdf(abs(t_value), df)
-        t_critical = t.ppf(1 - alpha/2, df)  
+        t_critical = t.ppf(1 - alpha/2, df) 
         ci_lower = mean_diff - t_critical * np.sqrt( 1/n1 + 1/n2) * sp
         ci_upper = mean_diff + t_critical * np.sqrt( 1/n1 + 1/n2) * sp
-        return t_value, 2*(1-t_prob), mean_diff, ci_lower, ci_upper
-
-    else:
+        return t_value, t_critical, 2*(1-t_prob), mean_diff, ci_lower, ci_upper
+    
+    elif alternative == 'greater':
         t_prob = t.cdf(t_value, df)
         t_critical = t.ppf(1 - alpha, df)
         ci_lower = mean_diff - t_critical * np.sqrt( 1/n1 + 1/n2) * sp
+        ci_upper = None
+        return t_value, t_critical, 1-t_prob, mean_diff, ci_lower, ci_upper
+    
+    elif alternative == 'less': 
+        t_prob = t.cdf(t_value, df)
+        t_critical = t.ppf(alpha, df)
+        ci_lower = None
         ci_upper = mean_diff + t_critical * np.sqrt( 1/n1 + 1/n2) * sp
-        return t_value, 1-t_prob, mean_diff, ci_lower, ci_upper
+        return t_value, t_critical, t_prob, mean_diff, ci_lower, ci_upper
+
+    else:
+        print('Error: unknown alternative selected')
+        return None, None, None, None, None, None
+
 
 np.random.seed(26)
-group1 = np.random.normal(46, 3, 100)
-group2 = np.random.normal(47, 3.5, 105)
-tval, pval, mean_diff, ci_low, ci_upp = ttest(group1=x1, group2=x2, two_tailed=True, alpha=0.05)
-print('t value = {:.4f}, pval = {:.4f}, 95% CI: {:.4f} to {:.4f}'.format(tstat, pval, ci_low, ci_upp))
+x1 = np.random.normal(46, 3, 100)
+x2 = np.random.normal(47, 3.5, 105)
+
+tval, tc, pval, mean_diff, ci_low, ci_upp = ttest(group1=x1, group2=x2, alternative='two-sided', alpha=0.05)
+print('t value = {:.4f}, pval = {:.4f}, 95% CI: {:.4f} to {:.4f}'.format(tval, pval, ci_low, ci_upp))
 ```
 ```python
-t value = 1.6286, pval = 0.1059, 95% CI: -1.5516 to 0.1500
+t value = -1.6242, pval = 0.1059, 95% CI: -1.5516 to 0.1500
 ```
 
 **Using Welch's t-interval**
@@ -261,14 +290,18 @@ import numpy as np
 
 def welch_t_test(avg_group1, variance_group1, n_group1, 
                  avg_group2, variance_group2, n_group2, 
-                 two_tailed = True, alpha=0.05):
+                 alternative='two-sided', alpha=0.05):
     """
     Runs Welch's test to determine if the average value of a metric differs 
-    between two independent samples.
-    Returns: t value, p value, mean difference, confidence interval upper and lower
+    between two independent samples. For AB testing, make group1 variant and group2 control (so difference = variant - control)
+    alternative: 
+        - two_sided: two-tailed test (Ha:mu1!=mu2). Checks upper tail: is abs(t) > critical t, with alpha=1-alpha/2.
+        - greater: one-tailed test (Ha:mu1>mu2). Checks upper tail: is t > critical t, with alpha=1-alpha. 
+        - less: one-tailed test (Ha:mu1<mu2). Checks lower tail: is t < critical t, with alpha=alpha.
+    Returns: t value, critical t, p value, mean difference, confidence interval upper and lower
     """
     
-    mean_difference = avg_group2 - avg_group1
+    mean_difference = avg_group1 - avg_group2
     mean_variance_group1 = variance_group1/n_group1
     mean_variance_group2 = variance_group2/n_group2
     
@@ -279,32 +312,44 @@ def welch_t_test(avg_group1, variance_group1, n_group1,
     dof_denom = ((mean_variance_group1)**2 / (n_group1-1)) + ((mean_variance_group2)**2 / (n_group2-1))
     dof = dof_numer / dof_denom
     
-    if two_tailed:
+    if alternative == 'two-sided':
         t_prob = t.cdf(abs(t_value), dof)
         t_critical = t.ppf(1 - alpha/2, dof) 
         ci_lower = mean_difference - t_critical * se
         ci_upper = mean_difference + t_critical * se
-        return t_value, 2*(1-t_prob), ci_lower, ci_upper
-
-    else:
+        return t_value, t_critical, 2*(1-t_prob), mean_difference, ci_lower, ci_upper
+    
+    elif alternative == 'greater':
         t_prob = t.cdf(t_value, dof)
         t_critical = t.ppf(1 - alpha, dof) 
         ci_lower = mean_difference - t_critical * se
+        ci_upper = None
+        return t_value, t_critical, 1-t_prob, mean_difference, ci_lower, ci_upper
+        
+    elif alternative == 'less': 
+        t_prob = t.cdf(t_value, dof)
+        t_critical = t.ppf(alpha, dof) 
+        ci_lower = None
         ci_upper = mean_difference + t_critical * se
-        return t_value, 1-t_prob, ci_lower, ci_upper
+        return t_value, t_critical, t_prob, mean_difference, ci_lower, ci_upper
+
+    else:
+        print('Error: unknown alternative selected')
+        return None, None, None, None, None, None
+
 
 np.random.seed(26)
-group2 = np.random.normal(46, 3, 100)
-group1 = np.random.normal(47, 3.5, 105)
+group1 = np.random.normal(46, 3, 100)
+group2 = np.random.normal(47, 3.5, 105)
 
-tstat, pval, ci_lower, ci_upper = welch_t_test(avg_group1=np.mean(group1), 
-                                               variance_group1 = np.var(group1, ddof=1), 
-                                               n_group1 = len(group1), 
-                                               avg_group2=np.mean(group2), 
-                                               variance_group2 = np.var(group2, ddof=1), 
-                                               n_group2 = len(group2), 
-                                               two_tailed = True,
-                                               alpha=0.05)
+tstat, t_critical, pval, mu_diff, ci_lower, ci_upper = welch_t_test(avg_group1=np.mean(group1), 
+                                                                   variance_group1 = np.var(group1, ddof=1), 
+                                                                   n_group1 = len(group1), 
+                                                                   avg_group2=np.mean(group2), 
+                                                                   variance_group2 = np.var(group2, ddof=1), 
+                                                                   n_group2 = len(group2), 
+                                                                   alternative = 'two-sided',
+                                                                   alpha=0.05)
 
 print('t value = {:.4f}, pval = {:.4f}, CI = {:.4f} to {:.4f}'.format(tstat, pval, ci_lower, ci_upper))
 ```
@@ -336,46 +381,64 @@ $$CI = \hat{p} \pm z_\text{critical} * SE_\text{difference}$$
 import numpy as np
 from scipy import stats
 
-def z_test_2_sample_proportions(x1, x2, n1, n2, two_tailed=True, alpha=0.05):
+def z_test_2_sample_proportions(x1, x2, n1, n2, alternative='two-sided', alpha=0.05):
     '''
-    Calculate the test statistic for a z-test on 2 proportions from independent samples
+    Calculate the test statistic for a z-test on 2 proportions from independent samples.
+    Note, for AB testing make group 1 variant and group 2 control (so difference = variant - control).
     x1, x2: number of successes in group 1 and 2
     n1, n2: total number of observations in group 1 and 2
     alpha: false positive rate (1-alpha=confidence)
+    alternative: 
+        - two_sided: two-tailed test (Ha:mu1!=mu2). Checks upper tail: is abs(t) > critical t, with alpha=1-alpha/2.
+        - greater: one-tailed test (Ha:mu1>mu2). Checks upper tail: is t > critical t, with alpha=1-alpha. 
+        - less: one-tailed test (Ha:mu1<mu2). Checks lower tail: is t < critical t, with alpha=alpha.
     Returns: test statistic (z), p-value, confidence interval lower and upper bounds
     '''
     avg_p = (x1 + x2) / (n1 + n2)
     z_val = (x1/n1 - x2/n2) / np.sqrt(avg_p * (1-avg_p) * (1/n1 + 1/n2))
-    z_prob = stats.distributions.norm.cdf(-np.abs(z_val))
     
     p1 = x1 / n1
     p2 = x2 / n2
     prop_diff = p1 - p2
     se = np.sqrt( (p1*(1-p1)) / n1 + (p2*(1-p2)) / n2)
 
-    if two_tailed:
+    if alternative == 'two-sided':
+        z_prob = stats.distributions.norm.cdf(np.abs(z_val))
         critical_z = stats.norm.ppf(1 - alpha/2)
         ci_lower = prop_diff - critical_z * se
         ci_upper = prop_diff + critical_z * se
-        return z_val, 2*z_prob, prop_diff, ci_lower, ci_upper
+        return z_val, critical_z, 2*(1-z_prob), prop_diff, ci_lower, ci_upper
 
-    else:
+    elif alternative == 'greater':
+        z_prob = stats.distributions.norm.cdf(z_val)
         critical_z = stats.norm.ppf(1 - alpha)
         ci_lower = prop_diff - critical_z * se
+        ci_upper = None
+        return z_val, critical_z, 1-z_prob, prop_diff, ci_lower, ci_upper
+
+    elif alternative == 'less':
+        z_prob = stats.distributions.norm.cdf(z_val)
+        critical_z = stats.norm.ppf(alpha)
+        ci_lower = None
         ci_upper = prop_diff + critical_z * se
-        return z_val, z_prob, prop_diff, ci_lower, ci_upper
+        return z_val, critical_z, z_prob, prop_diff, ci_lower, ci_upper
 
-z_val, pval, prop_diff, ci_lower, ci_upper = z_test_2_sample_proportions(x1=20, 
-                                                                           x2=25, 
-                                                                           n1=100, 
-                                                                           n2=102, 
-                                                                           two_tailed=True, 
-                                                                           alpha=0.05)
+z_val, critical_z, pval, prop_diff, ci_lower, ci_upper = z_test_2_sample_proportions(x1=20, x2=25, n1=100, n2=102, alternative='two-sided', alpha=0.05)
 
-print('Two sided z-test: z = {:.4f}, p value = {:.4f}, CI= {:.4f} to {:.4f}'.format(z_val, pval, ci_lower, ci_upper))
+print('Two sided (Ha:p1!=p2): z = {:.4f}, p value = {:.4f}, diff={:.3f}, CI= {:.4f} to {:.4f}'.format(z_val, pval, prop_diff, ci_lower, ci_upper))
+
+z_val, critical_z, pval, prop_diff, ci_lower, ci_upper = z_test_2_sample_proportions(x1=20, x2=25, n1=100, n2=102, alternative='less', alpha=0.05)
+
+print('One-sided (Ha:p1<p2) z-test: z = {:.4f}, p value = {:.4f}, CI= {:.4f} to {:.4f}'.format(z_val, pval, ci_lower, ci_upper))
+
+z_val, critical_z, pval, prop_diff, ci_lower, ci_upper = z_test_2_sample_proportions(x1=20, x2=25, n1=100, n2=102, alternative='greater', alpha=0.05)
+
+print('One-sided (Ha:p1>p2) z-test: z = {:.4f}, p value = {:.4f}, CI= {:.4f} to {:.4f}'.format(z_val, pval, ci_lower, ci_upper))
 ```
 ```python
-Two sided z-test: z = -0.7702, p value = 0.4412, CI= -0.1596 to 0.0694
+Two sided (Ha:p1!=p2): z = -0.7702, p value = 0.4412, diff=-0.045, CI= -0.1596 to 0.0694
+One-sided (Ha:p1<p2) z-test: z = -0.7702, p value = 0.2206, CI= 0.0510 to -0.1412
+One-sided (Ha:p1>p2) z-test: z = -0.7702, p value = 0.7794, CI= -0.1412 to 0.0510
 ```
 
 Using statsmodels to test below. Note, confint_proportions_2indep by default does 2-sided by dividing alpha by 2. To do one-sided, multiply alpha by 2 in the inputs. 
@@ -406,14 +469,28 @@ ci_lower, ci_upper = confint_proportions_2indep(count1=x1,
                                                 correction=False)
 
 print('Two sided z-test: z = {:.4f}, p value = {:.4f}, CI= {:.4f} to {:.4f}'.format(test_stat, pval, ci_lower, ci_upper))
+
+test_stat, pval = proportions_ztest(count=success_cnts, 
+                                    nobs=total_cnts, 
+                                    alternative='smaller')
+
+print('One-sided (Ha:p1<p2): z = {:.4f}, p value = {:.4f}'.format(test_stat, pval))
+
+test_stat, pval = proportions_ztest(count=success_cnts, 
+                                    nobs=total_cnts, 
+                                    alternative='larger')
+
+print('One-sided (Ha:p1>p2): z = {:.4f}, p value = {:.4f}'.format(test_stat, pval))
 ```
 ```python
 Two sided z-test: z = -0.7702, p value = 0.4412, CI= -0.1585 to 0.0700
+One-sided (Ha:p1<p2): z = -0.7702, p value = 0.2206
+One-sided (Ha:p1>p2): z = -0.7702, p value = 0.7794
 ```
 
 ### Confidence interval for ratio metrics (two independent samples):
 
-For metrics that are actually the ratio of two variables, we need to estimate the expected value and variance of the ratio. This can be difficult, and is not always known. Two common methods for ratio metrics are Fieller's theorem and the Delta method (also called Taylor's method). I'll demonstrate below with examples, but two common uses are:
+For metrics that are actually the ratio of two variables, we need to estimate the expected value and variance of the ratio. This can be difficult. Two common methods for ratio metrics are Fieller's theorem and the Delta method (also called Taylor's method). I'll demonstrate below with examples, but two common uses are:
 - 1) Calculating a CI for the percentage difference instead of the absolute difference (e.g. percentage change in average spend). The percentage is sometimes easier to interpret and compare than the absolute difference (e.g. 10% increase is clear, whereas a $5 difference requires you to check the baseline to decide if it's large).
 - 2) Calculating a CI for a ratio where the denominator is not the unit of randomisation (e.g. clicks/views when the experiment randomised visitors). In this case the observations are not independent.
 
@@ -490,7 +567,6 @@ $$variance(\%\Delta) = \frac{1}{\hat{x_c}^2} * var(\hat{x_t}) + \frac{\hat{x_t}^
 References:
 - Applying the Delta method in metric analytics: A practical guide with novel ideas ([Deng et al, 2018](https://www.researchgate.net/publication/323846161_Applying_the_Delta_method_in_metric_analytics_A_practical_guide_with_novel_ideas))
 - A Python implementation from that paper ([github](https://github.com/trangel/stats-with-python/blob/master/notebooks/delta%20method.ipynb))
-
 
 ## Bootstrap method
 

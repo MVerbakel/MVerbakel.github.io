@@ -21,15 +21,17 @@ Two-sided test (checking for any difference, larger or smaller):
 - Ho: mu1-mu2=0, there is no difference in the means of group 1 and 2 <br>
 - Ha: mu1!=mu2, there is some difference (not equal)
 
-Alternatively, a one-sided test would look something like:
+Alternatively, a one-sided test would look something like (only use if you're really only interested in differences in one direction, and have good reason to predict a particular direction):
 
-- Ho:mu1-mu2 < threshold, or Ho:mu1-mu2 > threshold.
+- Ho:mu1 <= mu2, or Ho:mu1 > =mu2
 
 **Step 2: Significance** <br>
 
 The level of significance (alpha), is the acceptable false positive rate. A common choice is 0.05, which means we expect our test to incorrectly reject the null hypothesis 1/20 times on average (i.e. we conclude there's sufficient evidence the means are not equal, when there's actually no difference). The other 95% of the time, we expect to correctly accept the null. The smaller the alpha selected, the larger the sample needed. It's common to see a larger alpha such as 0.1 in business settings (where more risk is tolerated), and a smaller alpha such as 0.01 in medical settings. Note, there is no significance level that is correct 100% of the time, we always have to trade-off the probability of a false positive, with having enough power to detect an effect when it exists.
 
-If it's a two sided test, we test whether the difference is positive or negative (both directions). In this case we divide alpha by 2 (e.g. for p=0.05, we use 0.025 on each side), and the result is significant if it's in the top or bottom 2.5%. For a one-tailed test we put the full 0.05 in one tail and so the result is significant if it's in that 5%.
+If it's a two sided test, we test whether the difference is positive or negative (both directions). In this case we divide alpha by 2 (e.g. for p=0.05, we use 0.025 on each side), and the result is significant if it's in the top or bottom 2.5%. For a one-tailed test we put the full 0.05 in one tail and so the result is significant if it's in that 5%. 
+
+![One vs two sided test](/assets/one_vs_two_sided.png)
 
 **Step 3: Test statistic** <br>
 
