@@ -29,13 +29,13 @@ Alternatively, a one-sided test would look something like (only use if you're re
 
 The level of significance (alpha), is the acceptable false positive rate. A common choice is 0.05, which means we expect our test to incorrectly reject the null hypothesis 1/20 times on average (i.e. we conclude there's sufficient evidence the means are not equal, when there's actually no difference). The other 95% of the time, we expect to correctly accept the null. The smaller the alpha selected, the larger the sample needed. It's common to see a larger alpha such as 0.1 in business settings (where more risk is tolerated), and a smaller alpha such as 0.01 in medical settings. Note, there is no significance level that is correct 100% of the time, we always have to trade-off the probability of a false positive, with having enough power to detect an effect when it exists.
 
-If it's a two sided test, we test whether the difference is positive or negative (both directions). In this case we divide alpha by 2 (e.g. for p=0.05, we use 0.025 on each side), and the result is significant if it's in the top or bottom 2.5%. For a one-tailed test we put the full 0.05 in one tail and so the result is significant if it's in that 5%. 
+If it's a two sided test, we test whether the difference is positive or negative (both directions). In this case we divide alpha by 2 (e.g. for p=0.05, we use 0.025 on each side), and the result is significant if it's in the top or bottom 2.5% (unlikely to occur when null is true). For a one-tailed test we put the full 0.05 in one tail and so the result is significant if it's in that tail. The advantage of one-sided tests is they have more power to detect changes in the hypothesised direction. The disadvantage is they have no statistical power to detect an effect in the other direction. So if you're unsure about the effect, a two-sided test is recommended. Jim Frost has some very accessible posts on the topic if you're interested in the opinions on this: [One vs two-tailed hypothesis tests](https://statisticsbyjim.com/hypothesis-testing/one-tailed-two-tailed-hypothesis-tests/#:~:text=Confidence%20intervals%20for%20a%20one,upper%20limit%20to%20this%20range.), [When can I use one-tailed hypothesis tests?](https://statisticsbyjim.com/hypothesis-testing/use-one-tailed-tests/).
 
 ![One vs two sided test](/assets/one_vs_two_sided.png)
 
 **Step 3: Test statistic** <br>
 
-Below we will discuss the specifics, but this is generally calculating the standardised difference between the two groups (relative to the variation in the data). We can then look at the sampling distribution under the null to determine how common a value like this (or larger) is, when the null hypothesis is true.
+Below we will discuss the specifics, but this is generally calculating the standardised difference between the two groups (relative to the variation in the data). So it's the same regardless of whether it's a one or two sided test. We can then look at the sampling distribution under the null to determine how common a value like this (or larger) is, when the null hypothesis is true.
 
 **Step 4: p-value** <br>
 

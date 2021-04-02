@@ -4,9 +4,9 @@ title: "Confidence intervals"
 mathjax: true
 ---
 
-The confidence interval quantifies the uncertainty of a sample estimate. When we estimate a population parameter with a sample statistic, it's unlikely it equals the population value exactly. For example, imagine we take a random sample of 10 birds out of thousands in a wildlife reserve each day, and compute their average weight. The sample averages will vary around the population average, but rarely equal it. Similarly, when we do an AB test, we randomly split the population into two groups (or a random percent of it). The observed difference between group A and B is an estimate of the true population difference (treatment effect), but the difference would vary if we repeated the experiment many times. As the name suggests, the confidence interval is a range of values around the sample estimate, within which we're reasonably confident the actual population parameter lies (in the first example, the average weight of all birds in the reserve). 
+The confidence interval quantifies the uncertainty of a sample estimate. When we estimate a population parameter with a sample statistic, it's unlikely it equals the population value exactly. For example, imagine we take a random sample of 10 birds out of thousands in a wildlife reserve each day, and compute their average weight. The sample averages will vary around the population average, but rarely equal it (as each time we get a slightly different sample by chance). Similarly, when we do an AB test, we randomly split the population into two groups (or a random percent of it). The observed difference between group A and B is an estimate of the true population difference (treatment effect), but the difference would vary if we repeated the experiment many times. 
 
-Below are some examples of confidence intervals. As demonstrated, the larger the sample size, and the smaller the standard deviation in the metric (i.e. the spread of the values), the closer the sample estimates will be to the population value, and the narrower the confidence interval will be. Meaning we can be more certain about the likely population value.
+As the name suggests, the confidence interval gives us a range of values around the sample estimate, within which we're reasonably confident the actual population parameter lies (in the first example, the average weight of all birds in the reserve). Below are some examples. As demonstrated, the larger the sample size, and the smaller the standard deviation in the metric (i.e. the spread of the values), the closer the sample estimates will be to the population value, and the narrower the confidence interval will be. Meaning we can be more certain about the likely population value.
 
 <br>
 
@@ -491,14 +491,15 @@ One-sided (Ha:p1>p2): z = -0.7702, p value = 0.7794
 ### Confidence interval for ratio metrics (two independent samples):
 
 For metrics that are actually the ratio of two variables, we need to estimate the expected value and variance of the ratio. This can be difficult. Two common methods for ratio metrics are Fieller's theorem and the Delta method (also called Taylor's method). I'll demonstrate below with examples, but two common uses are:
+
 - 1) Calculating a CI for the percentage difference instead of the absolute difference (e.g. percentage change in average spend). The percentage is sometimes easier to interpret and compare than the absolute difference (e.g. 10% increase is clear, whereas a $5 difference requires you to check the baseline to decide if it's large).
 - 2) Calculating a CI for a ratio where the denominator is not the unit of randomisation (e.g. clicks/views when the experiment randomised visitors). In this case the observations are not independent.
 
 #### Fieller's method (example for percentage change)
 
-The variance of the difference, variance(meanA - meanB), is simply variance(meanA) + variance(meanB). However, the variance of the percentage difference = variance((meanB-meanA)/meanA) = variance(meanB/meanA), which is a ratio metric. Given the two means come from normal distributions, they are jointly bivariate normal, and the ratio is also normally distributed.   
+The variance of the difference, variance(meanA - meanB), is simply variance(meanA) + variance(meanB). However, the variance of the percentage difference = variance((meanB-meanA)/meanA) = variance(meanB/meanA), which is a ratio metric. Therefore, we can't just convert the absolute difference CI bounds to percentages by dividing by the control group (dividing by the control results in a higher variance). 
 
-Fieller's theorem gives an approximate confidence interval for a ratio of means:
+Given the two means come from normal distributions, they are jointly bivariate normal, and the ratio is also normally distributed. Fieller's theorem gives an approximate confidence interval for a ratio of means in this scenario:
 
 ```python
 def ci_ratio_means(confidence, avg_control, stdev_control, n_control,
@@ -588,4 +589,6 @@ The downside of this method is that it can be slow, particularly if your working
 - The confidence interval and p-value are communicating the same information in different ways. They will always agree, assuming the settings and sample are the same (i.e. for the null hypothesis that the difference in means is 0, if the p-value is significant, the confidence interval for the difference won't overlap 0).
 - Generally we can estimate the sampling distribution by using the standard normal curve. However, there are many other methods out there. For ratio metrics, we have Fieller's method, and the delta method. For non-normal distributions, we have bootstrapping.
 
-References: [Scottish government's advice](https://www.gov.scot/publications/confidence-intervals-for-the-scottish-health-survey/)
+References: 
+- Scottish government's [advice on CIs](https://www.gov.scot/publications/confidence-intervals-for-the-scottish-health-survey/)
+- Confidence Intervals & P-values for Percent Change / Relative Difference [Georgiev, 2020](https://blog.analytics-toolkit.com/2018/confidence-intervals-p-values-percent-change-relative-difference/)
