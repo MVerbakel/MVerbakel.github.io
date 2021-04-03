@@ -320,3 +320,6 @@ Two sided Mann-Whitney test: U value = 12.8028, pval = 0.0000
     - 1) if is there is some kind of relationship between the customers (e.g. friends and family, who might discuss the treatment and influence each others outcomes); 
     - 2) if you can't be certain that each customer is unique (e.g. tracking by http cookie which could be refreshed, bots, or tracking by different IDs per device with multi-device users); and, 
     - 3) if supply is shared between the groups (so increased purchases in one group, impacts the ability of the other group to purchase).
+
+Other references:
+- [Scipy code](https://github.com/scipy/scipy/blob/5ab7426247900db9de856e790b8bea1bd71aec49/scipy/stats/stats.py#L5432)
