@@ -201,7 +201,7 @@ tstat, pval = ttest_ind(group1, group2, equal_var=False, alternative='two-sided'
 - The t-test was designed for small samples with unknown population variance. However, as the sample increases the t-distribution converges to normal and the degrees of freedom have little effect. Therefore, while the z-test is also suitable for large samples with unknown population variance, the t-test performs equally well (z and t statistic will be very similar) and so it's preferred for both small and large samples in practice.
 - The standard t-test assumes equal variances, meaning the treatment only impacted the means and not the variance (i.e. the distributions should have a similar shape and width). It's robust to violations if the sample sizes are equal. 
 - Welch's t-test doesn't make this assumption and is robust to unequal variances with and without equal sample sizes. Further, it performs equally well if in fact the sample sizes and/or variance are equal, so it's prefered in all cases over the standard t-test. 
-- Note, it's not recommended to actually test for equal variances and choose the test based on that. This has been shown to increase the false positive rate (type I error), see [Hayes and Cai, 2010](https://bpspsychub.onlinelibrary.wiley.com/doi/abs/10.1348/000711005X62576). 
+- Note, it's not recommended to actually test for equal variances and choose the test based on that. This has been shown to increase the false positive rate (type I error), see [Delacre et al., 2017](https://www.rips-irsp.com/articles/10.5334/irsp.82/#:~:text=We%20show%20that%20the%20Welch's,used%20as%20a%20default%20strategy.) and [Hayes and Cai, 2010](https://bpspsychub.onlinelibrary.wiley.com/doi/abs/10.1348/000711005X62576). 
 
 ### Common issues:
 - The central limit theorem (CLT) guarantees conversion to normal for all distributions with finite variance (doesn’t work for power law distributions). However, if the distribution of the observations is non-normal (e.g. skewed, exponential), the speed of convergence might require very large samples for this assumption to be met.
@@ -322,3 +322,4 @@ Two sided Mann-Whitney test: U value = 12.8028, pval = 0.0000
 
 Other references:
 - [Scipy code](https://github.com/scipy/scipy/blob/5ab7426247900db9de856e790b8bea1bd71aec49/scipy/stats/stats.py#L5432)
+- Delacre, M., Lakens, D., & Leys, C. (2017). [Why Psychologists Should by Default Use Welch’s t-test Instead of Student’s t-test](https://www.rips-irsp.com/articles/10.5334/irsp.82/#:~:text=We%20show%20that%20the%20Welch's,used%20as%20a%20default%20strategy.). International Review of Social Psychology, 30(1), 92–101. 
