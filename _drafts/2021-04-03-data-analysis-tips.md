@@ -17,3 +17,10 @@ Interpretation/causality:
 
 Effect size / cohens d
 
+
+Hypothesizing After the Result is Known (HARKing, Kerr 1998) is when you analyze the data many different ways (say different subgroups), discover an intriguing relationship, and then publish the data so it appears that the hypothesis was stated before the data were collected. 
+
+Many ways can p-hack: https://www.graphpad.com/guides/prism/latest/statistics/stat_advice_dont_p-hack.htm
+
+Choosing the right test:
+https://stats.idre.ucla.edu/other/mult-pkg/whatstat/

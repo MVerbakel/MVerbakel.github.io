@@ -85,7 +85,7 @@ Where $$s_p$$ is the pooled sample variance (estimate for population variance $$
 
 - Samples are independent and randomly selected.
 - Assumes variances are equal (using the sample variances to calculate a pooled estimate of the population variance for the standard error).
-- Assumes the means follow normal distributions (i.e. the sampling distribution of the estimator is normal). 
+- Assumes the means follow normal distributions (i.e. the sampling distribution of the estimator is normal). For small samples, assumes a t-distribution.
 
 In general, the t-test is fairly robust to all but large deviations from these assumptions. However, the equal variance assumption is often violated, so Welch's t-test (which doesn't assume equal variance) is more commonly used.
 
@@ -212,8 +212,7 @@ Example of winsorizing in Python. Taking an array of values, this outputs an arr
 
 ```python
 from scipy.stats.mstats import winsorize
-group1_winsorized = winsorize(group1_values, limits=[0.01, 0.99])
-group2_winsorized = winsorize(group2_values, limits=[0.01, 0.99])
+df['metric_winsorized'] = winsorize(df['metric'].values(), limits=[0.01, 0.99])
 ```
 
 ## Non-parametric tests for difference in means:
