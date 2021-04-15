@@ -28,7 +28,7 @@ The inputs:
 Let's say we have 1000 visitors per day, the base mean is 5 (muA=5), standard deviation = 8, and we want a minimum detectable effect of 0.5 (muB=5.5). We've been told we can only give the treatment to 10%, so we have 2 options:
 
 - 1) Split 50/50: put 10% in control and 10% in variant, giving us 200 visitors per day (20%). Plugging in our values with a sampling ratio of 1 (nA/nB), we will need a total of 8022 visitors (4011 in each group). With 200 visitors per day, our runtime is 8,022 / 200 = 40 days.
-- 2) Split 90/10: put 10% in variant and the remaining 90% in control, giving us the full 1000 visitors per day. Due to the uneven split, we now need a total of 22,280 visitors (nA=20,052 and nB=2228). However, despite the higher total, as we have a larger daily sample, we only need a runtime of 22,280 / 1000 = 22 days.
+- 2) Split 90/10: put 10% in variant and the remaining 90% in control, giving us the full 1000 visitors per day. Due to the uneven split (ratio=nA/nB=9/1=9), we now need a total of 22,280 visitors (nA=20,052 and nB=2228). However, despite the higher total, as we have a larger daily sample, we only need a runtime of 22,280 / 1000 = 22 days.
 
 [Sample size calculator](http://powerandsamplesize.com/Calculators/Compare-2-Means/2-Sample-Equality) used for the above.
 
