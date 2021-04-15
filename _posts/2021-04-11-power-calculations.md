@@ -21,7 +21,16 @@ The inputs:
 - **Statistical power:** The chance of detecting an effect when one actually exits. This is the inverse of the type II error rate (i.e. False Negatives as a proportion of those where Ho is False). The higher the power, the larger the sample size needed. A common choice is 0.8 (80%), meaning there's a 20% chance of a False Negative when there is actually an effect (Ho False).
 - **Significance level:** The chance of incorrectly detecting an effect (rejecting Ho) when Ho is True (i.e. the False Positive Rate (FPR), or type I error rate). The lower the significance level, the larger the sample size needs to be. The most common value chosen is 0.05 (5% FPR), but this is somewhat arbitrary. Note, decreasing the significance level to decrease the FPR will also reduce the power, all else equal (as we increase False Negatives by making the significance cutoff tougher).
 - **Minimum detectable effect:** The minimum effect that would be meaningful for this particular change. The smaller the effect you want to be able to detect, the larger the sample size will need to be (required sample approaches infinity as the effect approaches 0). This is often a tough one for those new to experimentation, but a necessary step. One approach is to consider the costs of implementing the change, e.g. how big does the effect need to be for it to be worthwhile? Or try thinking about possible results, e.g. if it's a 1%/2%/5% change, what would we do? 
-- **Sampling ratio:** The ratio of observations in control vs variant. The optimal ratio in terms of sample size is 1:1 (i.e. a 50%/50% split in observations). Deviations in either direction increase the required sample size. However, sometimes due to the cost or risk of exposing people to the treatment, a lower proportion of observations are assigned to the variant group. In this case, it's best to put the 'spare' observations in the control group to maximise power (as opposed to excluding them to get a 50/50 split). 
+- **Sampling ratio:** The ratio of observations in control vs variant. The optimal ratio in terms of sample size is 1:1 (i.e. a 50%/50% split in observations). Deviations in either direction increase the required sample size. However, sometimes due to the cost or risk of exposing people to the treatment, a lower proportion of observations are assigned to the variant group. In this case, it's best to put the 'spare' observations in the control group to maximise power (as opposed to excluding them to get a 50/50 split). I'll demonstrate this below with an example.
+
+**Sampling ratio example**
+
+Let's say we have 1000 visitors per day, the base mean is 5 (muA=5), standard deviation = 8, and we want a minimum detectable effect of 0.5 (muB=5.5). We've been told we can only give the treatment to 10%, so we have 2 options:
+
+- 1) Split 50/50: put 10% in control and 10% in variant, giving us 200 visitors per day (20%). Plugging in our values with a sampling ratio of 1 (nA/nB), we will need a total of 8022 visitors (4011 in each group). With 200 visitors per day, our runtime is 8,022 / 200 = 40 days.
+- 2) Split 90/10: put 10% in variant and the remaining 90% in control, giving us the full 1000 visitors per day. Due to the uneven split, we now need a total of 22,280 visitors (nA=20,052 and nB=2228). However, despite the higher total, as we have a larger daily sample, we only need a runtime of 22,280 / 1000 = 22 days.
+
+[Sample size calculator](http://powerandsamplesize.com/Calculators/Compare-2-Means/2-Sample-Equality) used for the above.
 
 ### An analogy
 
