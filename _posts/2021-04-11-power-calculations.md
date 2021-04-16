@@ -508,5 +508,5 @@ A trustworthy experiment should have the following outlined in a plan before the
 
 - Power of a test, [Wikipedia](https://en.wikipedia.org/wiki/Power_of_a_test)
 - [Colquhoun, 2014. An investigation of the false discovery rate and the misinterpretation of p-values](https://royalsocietypublishing.org/doi/10.1098/rsos.140216)
-https://www.itl.nist.gov/div898/handbook/prc/section2/prc222.htm
+- [Engineering Statistics Handbook, Sample Sizes Required](https://www.itl.nist.gov/div898/handbook/prc/section2/prc222.htm)
 - [Spotify's package for p-values, CIs, and sample size calculations](https://github.com/spotify/confidence/tree/a19e0d59d3808e851ae7a6d7b035b14405f5c560)
