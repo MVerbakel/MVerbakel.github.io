@@ -46,7 +46,7 @@ While it is still possible to detect an effect when one exists with low power (e
 
 ![Confusion Matrix](/assets/confusion_matrix.png)
 
-Let's say only 1% of our 1000 trials are actually effective (100/1000). With 20% power and a 5% significance level we expect 0.2 * 100 = 20 True Positives, and 0.05 * 900 = 45 False Positives. Giving a FDR of 45/(20+45) = 69%. Meaning the majority of our 'successful' experiments are actually False Positives. If we increase our power to 80%, we expect 0.8 * 100 = 80 True Positives, giving a FDR of 45/(80+45) = 36%. A notable improvement. This is why we should always aim for a relatively high power (e.g. 80%), to ensure we can trust the results of our experiment.
+Let's say only 10% of our 1000 trials are actually effective (100/1000). With 20% power and a 5% significance level we expect 0.2 * 100 = 20 True Positives, and 0.05 * 900 = 45 False Positives. Giving a FDR of 45/(20+45) = 69%. Meaning the majority of our 'successful' experiments are actually False Positives. If we increase our power to 80%, we expect 0.8 * 100 = 80 True Positives, giving a FDR of 45/(80+45) = 36%. A notable improvement. This is why we should always aim for a relatively high power (e.g. 80%), to ensure we can trust the results of our experiment.
 
 ## The problem with post-hoc (observed) power
 
