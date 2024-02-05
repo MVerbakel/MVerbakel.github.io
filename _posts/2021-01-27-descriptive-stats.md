@@ -4,7 +4,7 @@ title: "Descriptive statistics:<br> Python guide (NumPy/Pandas)"
 mathjax: true
 ---
 
-Descriptive statistics might seem simple, but they are a daily essential for anlaysts and data scientists. They allow us to summarise data sets quickly with just a couple of numbers, and are in general easy to explain to others. In this post I'll briefly cover when to use which statistics, and then focus on how to calculate them in Python. My approach is to first use just the base functions (so you understand the mechanics), and then show the equivelant functions for two common packages: NumPy (for lists/arrays etc.) and Pandas (for dataframes). 
+Descriptive statistics might seem simple, but they are a daily essential for analysts and data scientists. They allow us to summarise data sets quickly with just a couple of numbers, and are in general easy to explain to others. In this post I'll briefly cover when to use which statistics, and then focus on how to do them in Python. My approach is to first use just the base functions (so you understand the mechanics), and then show the equivelant functions for two common packages: NumPy (for lists/arrays etc.) and Pandas (for dataframes). 
 
 ## How to select appropriate statistics.
 
@@ -12,13 +12,13 @@ Descriptive statistics fall into two general categories:
 - 1) **Measures of central tendency** which describe a 'typical' or common value (e.g. mean, median, and mode); and, 
 - 2) **Measures of spread** which describe how far apart values are (e.g. percentiles, variance, and standard deviation). 
 
-We generally want one of each, but which ones will depend on the distribution of the data. Notice in the image below how the mean is pulled to the right in the skewed distribution, well the same is true for the standard deviation and variance. These statistics sum the values in some way, so extremes this will impact them. If the distribution is skewed and/or has outliers (e.g. income data), the median and percentiles will give a better representation of the center and spread as they're less affected. This will become more clear once we work through the formulas below. However, if the distribution is normal, we can use the mean and standard deviation which are more commonly understood, and easier to work with for things like financial calculations.
+We generally want one of each, but which ones will depend on the distribution of the data. Notice in the image below how the mean is pulled to the right in the skewed distribution, well the same is true for the standard deviation and variance. These statistics sum the values in their calculation, so extremes will impact them. If the distribution is skewed and/or has outliers (e.g. income data), the median and percentiles will give a better representation of the center and spread as they're less affected. This will become more clear once we work through the formulas below. However, if the distribution is normal, we can use the mean and standard deviation which are more commonly understood, and easier to work with for things like financial calculations and large data sets.
 
 ![Distributions](/assets/descriptive_statistics_distributions.png)
 
 <br>
 ## Computing statistics in Python
-Now we have an idea of when to use them, I'll show you the mechanics of how to calculate descriptive statistics with base Python functions. In reality, once you understand how they work, it's better to use packages that are optimised and maintained. Therefore, I'll also show the equivelant functions for NumPy and Pandas as well.
+Now we have an idea of when to use them, I'll show you the mechanics of how to calculate them with base Python functions. Once you understand how they work, it's better to use packages like NumPy or Pandas that are optimised and maintained. 
 
 These are the packages you'll need:
 ```python
@@ -207,7 +207,7 @@ cv = sample_std_dev/mean_estimate
 signal_noise_ratio = 1/cv
 ```
 
-### Quantiles, quatiles, and percentiles:
+### Quantiles, quartiles, and percentiles:
 
 Quantiles divide a distribution into equal-sized groups, giving the rank order of values. You might be more familiar with the term percentiles, which are just quantiles relative to 100, e.g. the 75th percentile is 75% or 3/4 of the way up the sorted list of values. A very common way is to split a distribution into 4 groups (quartiles) so that each group has 25% of the values. To achieve this we sort the values and cut at Q1 (25% below), Q2 (50% or the median), and Q3 (75%). You will see these often displayed in a boxplot.
 
@@ -305,12 +305,12 @@ max_value = data_pd.f1.max()
 
 ## Concluding thoughts
 
-Descriptive statistics are a useful tool for summarising large amounts of data. However, very different distributions can produce the same descriptive statistics, so I would always recommend visualising your data as well. Further, don't forget that these are just tools. Think carefully about the problem and what tools you choose for your analysis. 
+Descriptive statistics are a useful tool for summarising large amounts of data. However, remember that very different distributions can have the same descriptive statistics. Think carefully about what you're trying to understand and why, what mechanisms produce the data, and how you can contextualise or validate the results. A few general things to look out for:
 
-Below are a few final thoughts on what to look out for when using descriptive statistics:
+- **Representativeness:** Does your sample represent the population of interest? Are there any potential sources of bias? E.g. convenience sampling like gathering data from friends and family is not going to be a good representation of the full population in most cases, as the things which connect you can also effect the outcome of interest (e.g. education, where you live, where you work). A more subtle example would be using data from a set of users who engage with a feature, and expecting new users to behave the same way.
 
-- **Representativeness:** Does your sample represent the population of interest? If you want to understand average income in your home city but you only have data from your friends and family, the statistics are not likely to give you good estimates for the population. The reason is that your sample is biased. Your friends and family are not a random sample from the population, and so some of the things that connect you (e.g. where you live, what you do for a living, maybe education levels) can also effect income. 
-- **Nulls / missing values:** Clean up any nulls and other encoded values as they will effect the result and are automatically excluded in some functions. For example, if we want to know the average spend for all customers in our data, and null actually means $0, leaving them out would overestimate the result. If the data is missing/unknown (e.g. maybe gender was an optional field), you can relabel them as such, or fill them with a guess (e.g. the mean). Again, the choice can change the result so think about what makes sense for your data.
-- **Outliers:** As touched on earlier, if your data has outliers one option is to use statistics that are less sensitive to them e.g. median and percentiles. However, there are some other options: 1) remove them: only recommended if they're likely errors (most risky option); 2) replace them: e.g. cap/winsorize the variable so that the top/bottom 1% take the 1st/99th percentile value; or 3) separate them: if the values are coming from some sub-segment of the population that behaves differently, it may be better to split the data and analyse them separately (e.g. business vs regular customers).
+- **Nulls / missing values:** Clean up any nulls and other encoded values as they will effect the result and are automatically excluded in some functions. E.g. if null actually means $0, then replace with 0. If null means "unknown" for a categorical variable, you can also use "unknown" as a new level of that category.
+
+- **Outliers:** As touched on earlier, if your data has outliers one option is to use statistics that are less sensitive to them e.g. median and percentiles. However, other options include: 1) remove them: only recommended if they're likely errors (most risky option); 2) replace them: e.g. cap/winsorize the variable so that the top/bottom 1% take the 1st/99th percentile value; or 3) separate them: if the values are coming from some sub-segment of the population that behaves differently, it may be better to split the data and analyse them separately (e.g. business vs regular customers).
 
 
