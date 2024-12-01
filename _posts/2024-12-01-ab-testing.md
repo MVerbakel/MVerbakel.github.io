@@ -10,31 +10,32 @@ Some time ago I read the book [Trustworthy Online Controlled Experiments: a prac
 
 ### Motivation
 
-It's very hard to guess which changes will be successful, and the successes are usually small incremental gains. By reducing the overhead, tech companies have made it possible for almost anybody to test an idea. Every now and then, someone gets very lucky and a small change has a massive effect. For example, at Bing, adding some of the description to the headline of an ad, turned out to generate a $100M a year return. Similarly, despite a VP being dead against it, personalised recommendations based on a user's cart turned out to be very profitable for Amazon. They were also able to further improve on the original 'people who bought X bought Y', by generalising it to 'people who viewed X bought Y', and later 'people who searched X, bought Y'. Another area that's been shown again and again to have a positive effect on many metrics is performance improvements (e.g. speeding up page load can increase sales). 
+It's hard to guess which changes will be successful, and the successes are usually small incremental gains. By reducing the overhead, tech companies have made it possible for almost anybody to test an idea. Every now and then, someone gets lucky and a small change has a massive effect. At Bing, adding some of the description to the headline of an ad turned out to generate a $100M/year. Similarly, despite a VP being against it, personalised recommendations based on a user's cart turned out to be very profitable for Amazon. They were then able to improve on the original 'people who bought X bought Y', by generalising it to 'people who viewed X bought Y', and later 'people who searched X, bought Y'. Another area that's been shown again and again to have a positive effect on many metrics is performance improvements (e.g. speeding up page load can increase sales). 
 
 However, don't get too excited, you shouldn't expect a large number of your experiments to succeed like this. It can also go the other way, for example Bing expected integrating with social networks would have a strong positive effect. After two years of experimenting and not seeing value, it was abandoned.
 
 ### Why do we need randomised experiments?
 
-Imagine we launched a new feature and observed users who interacted with the feature. Maybe we see that users who interact with the feature are 50% less likely to churn than those who didn't. Does that mean our feature causes less churn? We don't know from this analysis because the users self selected into the the treatment, and are not necessarily similar to those who didn't. Perhaps heavy users are more likely to interact with the feature, and thus they naturally have a lower churn rate (regardless of whether the feature is there or not). We can't say anything about the effect of the treatment on churn. 
+Imagine we launched a new feature and observed users who interacted with it. Maybe those users are 50% less likely to churn than those who didn't interact. Does that mean our feature causes less churn? We can't say anything about the effect of the treatment on churn. The users self selected into the the treatment, and therefore are unlikely to otherwise be comparable to those who didn't. Perhaps heavy users are more likely to interact with the feature, and thus they naturally have a lower churn rate (regardless of whether the feature is there or not). 
 
-In it's simplest form, an experiment involves randomly splitting users into two groups: one sees no change from normal (control), and the other sees some new feature or change (variant). User interactions in both groups are monitored and logged (instrumented). Then at the end of the experiment, we use this data to assess the differences between the two groups on various metrics. By randomising which users are exposed to the feature in an experiment, we know that the only difference between the two groups is due to the change (plus some random variation). This is why experiments are the gold standard for establishing causality, and sit near the top of the [hierarchy of evidence](https://en.wikipedia.org/wiki/Hierarchy_of_evidence). 
+In it's simplest form, an experiment solves this by randomly splitting users into two groups: one sees no change from normal (control), and the other sees some new feature or change (variant). User interactions in both groups are monitored and logged (instrumented). Then at the end of the experiment, we use this data to assess the differences between the two groups on various metrics. By randomising which users are exposed, we know that the only difference between the two groups is due to the change (plus some random variation). This is why experiments are the gold standard for establishing causality, and sit near the top of the [hierarchy of evidence](https://en.wikipedia.org/wiki/Hierarchy_of_evidence). 
 
-When possible, a controlled experiment is often both the easiest, most reliable and sensitive mechanism to evaluate changes. We still can't measure the effect of interacting with the feature, only the effect of being exposed, but this is generally enough to guide product development. In addition to facilitating learning, experiments can also be great for rolling out features (as they can easily be rolled back if there are issues).
+When possible, a controlled experiment is often the easiest, most reliable and sensitive mechanism to evaluate changes. We're measuring the effect of being exposed, but this is generally enough to guide product development. Experiments can also be great for rolling out features because they provide an easy way to roll back if there's issues.
 
 ### Tenets for success
 
-In chapter 3, three key tenets for success are discussed for organisations that wish to run experiments, paraphrased below:
+Three key tenets for success were discussed in the book for a company to succeed with experimentation:
 
 - **1) They want to make data-driven decisions and have quantifiable goals.** There is a cost to experimentation and it will slow down progress. It's a lot easier to make a plan, execute on it, and declare success. However, this doesn't the change true effect. To paraphrase [Lukas Vermeer](https://diggintravel.com/travel-digital-products-booking-com-case/), you might run faster blindfolded because you don't see the wall coming, but you're still going to hit the wall. It's also necessary that the goals are actually quantifiable (measurable in the short term, sensitive to change, and predictive of longer term goals).
 - **2) They're willing to invest in infrastructure and tests to ensure the results are trustworthy.** In large established companies it's relatively easy to get numbers, but hard to make sure they're trustworthy. In other industries, even being able to run experiments reliably may be difficult/illegal/unethical; and,
 - **3) They recognise that they are not good at evaluating the value of ideas.** This is a hard one for some to accept, as team's build features and make changes because they think it will add value. However, based on the experience of many companies (including Microsoft, Google, Slack, and Netflix), you should expect 70-90% of your tests to fail to detect any effect. The more optimised the product becomes, the harder it gets to move the needle. That's why it's important to fail fast, and test for signals first (e.g. before building a complex model for some feature, test the idea with some simple business logic first). 
 
-Depending on the maturity level of the company, these might also develop over time. Chapter 4 of the book has some good advice on the stages of maturity and what to focus on if you're in the earlier stages.
+Depending on the maturity level of the company, these might develop over time. Chapter 4 of the book has some good advice on the stages of maturity and what to focus on if you're in the earlier stages.
 
-## Part 1. Pre-experiment: experiment design
+---
+## Part 1. Pre-experiment design
 
-Though the standard A/B test sounds pretty simple at first, the design stage can be very involved. Once I understand the hypothesis and treatment (e.g. what is the mechanism by which we expect to see an effect), below are some of the questions I'm thinking about at this stage:
+Though a standard A/B test is pretty simple, the design stage is important. Once you understand the hypothesis and treatment (e.g. what is the mechanism by which we expect to see an effect), below are some of the questions to think about:
 
 - **What kind of set up do we need?** A/A (to get some data, or test our setup is working), A/B (one variant), A/B/n (multiple variants), or a holdout/blackout design.
 ![Experiment types](/assets/experiment_types.png)
@@ -59,31 +60,26 @@ The above should then be wrapped up into a clear experiment plan and hypothesis.
 > Measure a salesman by the orders he gets (output), not the calls he makes (activity)
 > -- Andrew Grove
 
+It's important we decide which metrics are important before the experiment, otherwise it can be tempting to build a story around whatever shows up as positive in the results (which might be a False Positive). This is called fishing or HARKing (hypothesising after the results are known).
+
 Experiment metrics must be quantifiable, measurable in the short term (during the experiment), and sensitive to changes within a reasonable time period. For example, a high variance metric like revenue per user can be capped to improve power, whereas the original revenue data including extremes would be important for business reporting. Similarly, if your product is subscription based, the renewal frequency may be too long to see changes in an experiment, in which case surrogates like usage metrics may be used as early indicators.
 
-In the book they talk about the concept of an Overall Evaluation Criterion (OEC), which (potentially) combining multiple metrics, gives a single metric that's believed to be causally related to the long-term business goals to optimise for. For example, for a search engine, the OEC could be a combination of usage (e.g. sessions per user), relevance (e.g. successful sessions, or time to success), and ad revenue metrics. It could also be a single metric like active days per user (if the target is to increase user engagement). To combine multiple metrics, they can first by normalised (0-1), then assigned a weight. This will require definition of how much each component should contribute. For example, how much churn is tolerable if engagement and revenue increase more than enough to compensate? If growth is a priority, there might be a low tolerance for churn. 
+In the book they talk about the concept of an Overall Evaluation Criterion (OEC), which (potentially) combining multiple metrics, gives a single metric that's believed to be causally related to the long-term business goals to optimise for. For example, for a search engine, the OEC could be a combination of usage (e.g. sessions per user), relevance (e.g. successful sessions, or time to success), and ad revenue metrics. It could also be a single metric like active days per user (if the target is to increase user engagement). To combine multiple metrics, they can first by normalised (0-1), then assigned a weight. This will require definition of how much each component should contribute. For example, how much churn is tolerable if engagement and revenue increase more than enough to compensate? If growth is a priority, there might be a low tolerance for churn. In practice, you still want to track the components as well to understand movements.
 
-It's important we decide which metrics are important before the experiment, otherwise it can be tempting to build a story around whatever shows up as positive in the results (remembering if we test enough metrics we'll get some false positives). This is like the texas sharp shooter problem: it's easier to shoot first, then draw targets around the bullet holes. In statistics this is also called fishing or HARKing (hypothesising after the results are known).
-
-### Metric examples 
-Goal -> feature -> metrics
-
-Amazon emails: Originally the team used click-through revenue, but this increases with email volume, leading to spamming. So while it optimised the short term revenue, users unsubscribed and then Amazon lost the chance to target them in the future. They later switched to an OEC with a lifetime loss estimate if the user unsubscribes. Even if the lifetime loss is estimated at only a few dollars, this showed more than half of their campaigns have a negative effect based on the OEC.
-
+#### Metric examples (goal -> feature -> metrics)
+- Amazon emails: Originally the team used click-through revenue, but this increases with email volume, leading to spamming. So while it optimised the short term revenue, users unsubscribed and then Amazon lost the chance to target them in the future. They later switched to an OEC with a lifetime loss estimate if the user unsubscribes. Even if the lifetime loss is estimated at only a few dollars, this showed more than half of their campaigns have a negative effect based on the OEC. 
 $$OEC = \frac{(\sum_i{revenue_i - unsubscriber * \text{lifetime loss}})}{n}$$
+- Bing: At Bing, progress is measured by query share and revenue. However, they once found a ranking bug which lowered the quality of results actually increased both as users were forced to do more queries and clicked more ads (results). This clearly doesn't align with Bing's long term goals. Using sessions per user would be better in this case as satisifed users will return and use Bing more. This example demonstrates what can happen when revenue metrics are used without constraints (we want to increase revenue, but not at the cost of other metrics like engagement). For ads, one way to enforce a constraint is to limit the average number of pixels that can be used over multiple queries.
+- New feature added: Click-throughs on the feature won't capture the impact on the rest of the page so could allow cannibalisation. A whole page click-through metric would be better (penalised for bounces), along with conversion rate (successful purchase), and time to success.
 
-Bing: At Bing, progress is measured by query share and revenue. However, they once found a ranking bug which lowered the quality of results actually increased both as users were forced to do more queries and clicked more ads (results). This clearly doesn't align with Bing's long term goals. Using sessions per user would be better in this case as satisifed users will return and use Bing more. This example demonstrates what can happen when revenue metrics are used without constraints (we want to increase revenue, but not at the cost of other metrics like engagement). For ads, one way to enforce a constraint is to limit the average number of pixels that can be used over multiple queries.
-
-New feature added: Click-throughs on the feature won't capture the impact on the rest of the page so could allow cannibalisation. A whole page click-through metric would be better (penalised for bounces), along with conversion rate (successful purchase), and time to success.
-
-### Evaluating metrics:
+#### Evaluating metrics:
 
 - For new metrics, what additional information are they adding?
 - For old metrics, periodically check if they've encouraged gaming (is there a notable behaviour of moving metrics just over the threshold), and whether there are any other areas for improvement.
 - For both new and old, it's also important to regularly validate that the assumptions are met for the statistical tests being used. See my post [here](https://mverbakel.github.io/2021-04-03/metric-validation) on how to do this.
 - Causal validation of the relationship between drivers and goals (difficult given correlation does not imply causation). Some methods for this include: checking if surveys / user research / careful observational analysis / external research mostly seem to point in the same direction; running experiments specifically to try test different parts; and, using a set of well understood past experiments to test new metrics.
 
-### Improving sensitivity with variance reduction
+#### Improving sensitivity with variance reduction
 
 One way we can improve the power of a test (sensitivity), is by reducing variance. When variance is reduced, there's less overlap between the distributions of control and variant, making the effect more clear. 
 
@@ -101,11 +97,12 @@ Ways to reduce variance:
 - **Paired experiment**: If it's possible to test both variant and control for the same user, a paired design will remove the between-user variability. For example, we can test two ranked lists at the same time with a design called interleaving (see this Netflix [post](https://netflixtechblog.com/interleaving-in-online-experiments-at-netflix-a04ee392ec55) for examples).
 - **Pooled control group**: If you have multiple experiments running at the same time, each with their own control group, you might be able to combine them to increase the sample size and power.
 
-
+---
 ## Part 2. During the experiment
 
 There can be a number of issues that pop up during an experiment. Usually they are around instrumentation, randomisation, ramping, or concurrent experiments. Monitoring and alerts are useful here to catch the problems early (e.g. test for a significant difference in the size of the control/test samples). I might come back to write on this in the future, but for now I'm mostly skipping over the topic to focus on where I spend the most time.
 
+---
 ## Part 3. Post experiment analysis
 
 ### Twyman's Law
@@ -166,6 +163,8 @@ Measuring long term effects is always a challenge given we typically want to lau
 - Proxies: Use short term metrics that are correlated with long term outcomes. For example, maybe 2 week retention is a good predictor of 1 year retention and so we can make our decision based on the 2 week result. Just give some thought as to whether you're treatment could notably change the relationship between the short and long term metrics you're using.
 - Holdouts: These are typically 6 or 12 month long experiments where you hold out a small % of your population from 1 or more launches to see the long term effect. Maintenance is the main downside here as holdouts can be corrupted by unexpected errors that render them unusable. It's also important to consider network effects between the holdout users and other users that might cause leakage (resulting in either an over or underestimated effect).
 
+## Other topics
+
 ### Threats to experiment validity
 
 **1) Internal validity (truth in the experiment):**
@@ -188,13 +187,11 @@ Can the results be generalised to new people/situations/time periods beyond what
 **3) Statistical validity:**
 It's important that appropriate statistical tests are chosen (usually built-in to the company tool), but also that the assumptions of the test are met (see my [post](https://mverbakel.github.io/2021-04-03/metric-validation) for how to validate continuous metrics). However, often the most common mistakes are simple, e.g. not adhering to the runtime and/or stopping when significance is reached.
 
-## Other topics
-
-## Opt-in products
+### Opt-in products
 
 Delayed Activation (e.g. opt-in products): Usually you would randomise assignments for some recruitment period, and then continue to observe for some observation window to give time for people to activate. Otherwise you might underestimate the effect size as newer users haven't had time to activate.
 
-## Experiments with an expected impact on performance
+### Experiments with an expected impact on performance
 
 Sometimes we expect a new feature will negatively impact performance (e.g. calculations are required before showing the page, slowing down the page load). Before we spend time optimising a feature to address the performance impact though, we first want to know if it has any value. One way to separate the effect of the performance from the effect of the feature is to add a variant that does the calculations but doesn't show the change:
 
@@ -204,15 +201,15 @@ Sometimes we expect a new feature will negatively impact performance (e.g. calcu
 
 The difference between the control and variant 1 is the effect of any performance loss (as the only difference is the calculations etc. being done in variant 1). The difference between variant 1 and variant 2 gives us the effect of the feature (assuming no performance impact), as both should have the same performance. Finally, the difference between variant 2 and the control is the total effect of switching to this feature (including the effect of any performance change). If this total effect is positive, any performance loss is outweighed by the effect of the feature and so we could ship the change. However, if the total effect is negative, but the feature effect is positive and the performance effect is negative, we'll need to work on optimisations to address the performance issues. 
 
-## Strategy decisions
+### Strategy decisions
 
 When goals can be measured with well defined metrics, experiments can help companies "hill climb" to a local optimum. However, if you want to try something far from the current, it takes more resources to get an MVP and it's more likely to fail. This is because testing big changes in experiments requires longer and larger experiments (more likely to have primacy/novelty effects), and you may need many experiments to isolate what is and isn't working. That said, experiments can still help reduce the uncertainty and provide gaurdrails for changes. Beyond that, a useful question to consider is "how will additional information help decision making?".
 
-## When not to experiment?
+### When not to experiment?
 
 Sometimes a decision needs to be made, and an experiment is simply not practical. For example: the population of users is too small and you would have to run the experiment for an impractically long time; you're retention period for the ID is limited so you can't run the experiment long enough; or, there are legal/ethical reasons. Experimentation is just one tool in the toolbox, and sometimes qualitative approaches make more sense (e.g. usability tests, interviews), or a quasi-experiment methodology can be useful (e.g. a geo experiment randomising at the country/region level, or randomising time instead of users).
 
-## Estimating the cumulative impact of experiments
+### Estimating the cumulative impact of experiments
 
 To calculate team impact, some still add up the estimated average effect for a target metric across all the experiments that they decided to launch. This assumes each launch is additive (independent), and the effect is stable over time. However, even with those assumptions it will over-estimate the effect due to m-error. This [post](https://booking.ai/raising-the-bar-by-lowering-the-bound-3b12d3bd43a3) explains it well, but essentially we truncate the distribution of effect sizes by imposing a significance threshold. If teams run under-powered experiments, the over-estimation will be worse.
 
