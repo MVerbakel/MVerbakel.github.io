@@ -59,6 +59,21 @@ For a more detailed refresher on Linear Algebra, Strang's [MIT course](https://o
 
 Instead of using the normal equation as described above, for larger samples we could instead find the coefficients that minimise the RSS (or any cost function) with an algorithm called Gradient Descent. The basic idea is to start with some values for the unknown parameters (coefficients), and gradually change them depending on whether the outcome was over or under predicted (using the derivative of the function to determine the direction of the slope). After a number of steps, we hopefully end up at the minimum. We can set the size of each step with the learning rate, but keep in mind too small a step will take a long time while too large a step can cause it to fail to converge (keep overshooting). As the squared error is quadratic, there is only the one global minimum and so Gradient Descent will always converge in the case of linear regression. Note, for multiple features, we repeat this process for each feature. When the range of each feature varies a lot, it will make Gradient Descent slower (descends quicker on small ranges), so it's advised to scale the features first.
 
+
+## Implementing in Python
+
+Statsmodels vs scipy...
+
+### Performance
+Bias vs variance, under/overfitting
+
+
+### Regularisation
+
+
+### Stability
+
+
 ### Interpretation
 
 For example, one possible solution might be:
@@ -66,6 +81,27 @@ For example, one possible solution might be:
 $$\text{predicted sale price in 1000's} = 50 + 30 * \text{nr_bedrooms} + 20 * \text{nr_bathrooms} + 60 * \text{has_pool}$$
 
 In this model, having a pool increases the predicted sale price by 60K, and for each additional bedroom the sale price increases by 30K. 
+
+
+but there are also other methods for fitting a linear model, e.g. .
+
+
+### What next?
+
+Examples of using the results, testing in an experiment.
+
+## Summary
+
+Pros
+Cons
+...
+
+## Extension: regression adjustment
+
+Reducing variance in an experiment.
+
+
+
 
 
 
@@ -111,8 +147,17 @@ An alternative method is Maximum Likelihood Estimation (MLE). In a linear model,
 
 
 Linear regression can also be generalized to handle other kinds of dependent variables. If the dependent variable is boolean, the generalized model is called logistic regression. If the dependent variable is an integer count, it’s called Poisson regression.
-
 Maximum likelihood estimation can be performed when the distribution of the error terms is known to belong to a certain parametric family ƒθ of probability distributions.[12] When fθ is a normal distribution with zero mean and variance θ, the resulting estimate is identical to the OLS estimate. GLS estimates are maximum likelihood estimates when ε follows a multivariate normal distribution with a known covariance matrix.
 Ridge regression[13][14][15] and other forms of penalized estimation, such as Lasso regression,[5] deliberately introduce bias into the estimation of β in order to reduce the variability of the estimate. The resulting estimates generally have lower mean squared error than the OLS estimates, particularly when multicollinearity is present or when overfitting is a problem. They are generally used when the goal is to predict the value of the response variable y for values of the predictors x that have not yet been observed. These methods are not as commonly used when the goal is inference, since it is difficult to account for the bias.
 Least absolute deviation (LAD) regression is a robust estimation technique in that it is less sensitive to the presence of outliers than OLS (but is less efficient than OLS when no outliers are present). It is equivalent to maximum likelihood estimation under a Laplace distribution model for ε.[16]
 
+
+
+Linear
+Ordinary Least squares
+MLE - max likelihood estimation
+GLM
+Logistic
+Polynomial
+Regularisation
+...

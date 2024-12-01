@@ -4,7 +4,7 @@ title: "Non-inferiority testing"
 mathjax: true
 ---
 
-Non-inferiority tests are just one-sided tests with a margin. However, they're pretty useful in experimentation. For example, let's say you're adding a new feature to your web shop. You're primarily interested in increasing revenue, but at the same time you don't want to hurt other metrics like the average page load time, or volume of customer service queries. Metrics that you just want to keep an eye on like these are sometimes called 'guardrails'. For these metrics, we want to make sure the new version of the site is not worse (non-inferior) to the current, so we only need to test for changes in one direction.
+Non-inferiority tests are just one-sided tests with a margin, but they are quite useful in experimentation. For example, let's say you're adding a new feature to your web shop. You're primarily interested in increasing revenue, but at the same time you don't want to hurt other metrics like the average page load time, or volume of customer service queries. Metrics that you just want to keep an eye on like these are sometimes called 'guardrails'. For these metrics, we want to make sure the new version of the site is not worse (non-inferior) to the current, so we only need to test for changes in one direction.
 
 ## Hypothesis
 
