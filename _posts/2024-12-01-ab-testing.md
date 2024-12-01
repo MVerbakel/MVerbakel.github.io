@@ -35,7 +35,8 @@ Depending on the maturity level of the company, these might develop over time. C
 ---
 ## Part 1. Pre-experiment design
 
-Though a standard A/B test is pretty simple, the design stage is important. Once you understand the hypothesis and treatment (e.g. what is the mechanism by which we expect to see an effect), below are some of the questions to think about:
+### General set up
+Once you understand the hypothesis and treatment (e.g. what is the mechanism by which we expect to see an effect), below are some of the questions to think about:
 
 - **What kind of set up do we need?** A/A (to get some data, or test our setup is working), A/B (one variant), A/B/n (multiple variants), or a holdout/blackout design.
 ![Experiment types](/assets/experiment_types.png)
@@ -60,26 +61,22 @@ The above should then be wrapped up into a clear experiment plan and hypothesis.
 > Measure a salesman by the orders he gets (output), not the calls he makes (activity)
 > -- Andrew Grove
 
-It's important we decide which metrics are important before the experiment, otherwise it can be tempting to build a story around whatever shows up as positive in the results (which might be a False Positive). This is called fishing or HARKing (hypothesising after the results are known).
+Decide which metrics are important before the experiment starts to avoid the temptation of building a story around the results (which might be False Positives). They should be quantifiable, measurable in the short term (during the experiment), and sensitive to changes within a reasonable time period. Typically there will be a small number of "primary" metrics, some "secondary" metrics to help understand the primary movements, and guardrail metrics (monitoring things like performance). In the book they talk about the concept of an OEC, which (potentially) combines multiple metrics, to give a single metric that's believed to be causally related to the long-term business goals. For example, for a search engine, the OEC could be a combination of usage (e.g. sessions per user), relevance (e.g. successful sessions, or time to success), and ad revenue metrics. It could also be a single metric like active days per user (if the target is to increase user engagement). To combine multiple metrics, they can first by normalised (0-1), then assigned a weight. This will require definition of how much each component should contribute. For example, how much churn is tolerable if engagement and revenue increase more than enough to compensate? If growth is a priority, there might be a low tolerance for churn. In practice, you still want to track the components as well to understand movements.
 
-Experiment metrics must be quantifiable, measurable in the short term (during the experiment), and sensitive to changes within a reasonable time period. For example, a high variance metric like revenue per user can be capped to improve power, whereas the original revenue data including extremes would be important for business reporting. Similarly, if your product is subscription based, the renewal frequency may be too long to see changes in an experiment, in which case surrogates like usage metrics may be used as early indicators.
-
-In the book they talk about the concept of an Overall Evaluation Criterion (OEC), which (potentially) combining multiple metrics, gives a single metric that's believed to be causally related to the long-term business goals to optimise for. For example, for a search engine, the OEC could be a combination of usage (e.g. sessions per user), relevance (e.g. successful sessions, or time to success), and ad revenue metrics. It could also be a single metric like active days per user (if the target is to increase user engagement). To combine multiple metrics, they can first by normalised (0-1), then assigned a weight. This will require definition of how much each component should contribute. For example, how much churn is tolerable if engagement and revenue increase more than enough to compensate? If growth is a priority, there might be a low tolerance for churn. In practice, you still want to track the components as well to understand movements.
-
-#### Metric examples (goal -> feature -> metrics)
+#### Examples (goal -> feature -> metrics)
 - Amazon emails: Originally the team used click-through revenue, but this increases with email volume, leading to spamming. So while it optimised the short term revenue, users unsubscribed and then Amazon lost the chance to target them in the future. They later switched to an OEC with a lifetime loss estimate if the user unsubscribes. Even if the lifetime loss is estimated at only a few dollars, this showed more than half of their campaigns have a negative effect based on the OEC. 
 $$OEC = \frac{(\sum_i{revenue_i - unsubscriber * \text{lifetime loss}})}{n}$$
 - Bing: At Bing, progress is measured by query share and revenue. However, they once found a ranking bug which lowered the quality of results actually increased both as users were forced to do more queries and clicked more ads (results). This clearly doesn't align with Bing's long term goals. Using sessions per user would be better in this case as satisifed users will return and use Bing more. This example demonstrates what can happen when revenue metrics are used without constraints (we want to increase revenue, but not at the cost of other metrics like engagement). For ads, one way to enforce a constraint is to limit the average number of pixels that can be used over multiple queries.
 - New feature added: Click-throughs on the feature won't capture the impact on the rest of the page so could allow cannibalisation. A whole page click-through metric would be better (penalised for bounces), along with conversion rate (successful purchase), and time to success.
 
-#### Evaluating metrics:
+### Evaluating metrics:
 
 - For new metrics, what additional information are they adding?
 - For old metrics, periodically check if they've encouraged gaming (is there a notable behaviour of moving metrics just over the threshold), and whether there are any other areas for improvement.
 - For both new and old, it's also important to regularly validate that the assumptions are met for the statistical tests being used. See my post [here](https://mverbakel.github.io/2021-04-03/metric-validation) on how to do this.
 - Causal validation of the relationship between drivers and goals (difficult given correlation does not imply causation). Some methods for this include: checking if surveys / user research / careful observational analysis / external research mostly seem to point in the same direction; running experiments specifically to try test different parts; and, using a set of well understood past experiments to test new metrics.
 
-#### Improving sensitivity with variance reduction
+### Improving sensitivity with variance reduction
 
 One way we can improve the power of a test (sensitivity), is by reducing variance. When variance is reduced, there's less overlap between the distributions of control and variant, making the effect more clear. 
 
