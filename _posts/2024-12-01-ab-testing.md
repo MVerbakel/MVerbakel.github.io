@@ -105,65 +105,9 @@ There can be a number of issues that pop up during an experiment. Usually they a
 ---
 ## Part 3. Post experiment analysis
 
-### Twyman's Law
+In the A/B case, we have two independent random samples, and summary statistics for each of our metrics in each sample. Comparing the means, gives us an estimate of the average treatment effect in the population. However, by chance, we expect some random variation between the two groups, and so the observed difference will vary around the true effect in the population (i.e. even if the null is true and there is no efect, we will still observed differences). Therefore, it's important we correctly estimate the standard error (how much we expect estimates to vary with repeated sampling), so we can assess whether a difference is 'large enough' for us to reject the null hypothesis. To do this, we compare the observed difference to the range of values we would observe if the null was true (so assuming the null is true, how likely is it we would observe a difference at least as extreme as this). If the result is surprising, we reject the null and conclude there is likely an effect (the result is significant).
 
-> The more unusual or interesting the data, the more likely they are to have been the result of an error of one kind or another (Kohavi et al., chapter 3).
-
-I've seen this time and time again. Errors are more common than a truly large effect (e.g. logging issues, calculation errors, or missing/duplicated data). This is particularly a problem because we tend to create a story around positive results and want to believe it, but look to dismiss negative results and blame data problems. The advice here is to always treat those 'too good to be true' results with a healthy dose of skepticism as well.
-
-### Statistics of A/B testing
-
-In the A/B case, we have two independent random samples, and summary statistics for each of our metrics in each sample. Comparing the means for example, gives us an estimate of the average treatment effect in the population. However, by chance, we expect some random variation between the two groups, and so the observed difference will vary around the true effect in the population (i.e. even if the null is true and there is no efect, we will still observed differences). Therefore, it's important we correctly estimate the standard error (how much we expect estimates to vary with repeated sampling), so we can assess whether a difference is 'large enough' for us to reject the null hypothesis. To do this, we compare the observed difference to the range of values we would observe if the null was true (so assuming the null is true, how likely is it we would observe a difference at least as extreme as this). If the result is surprising, we reject the null and conclude there is likely an effect (the result is significant).
-
-I've gone into some depth on the different tests common to A/B testing in previous posts. In general though, the t-test or Welch's t-test is most common for comparing the means, and a z-test for proportions or a g-test are common for comparing proportions. For binary metrics, see [here](https://mverbakel.github.io/2021-02-13/two-sample-proportions), and for continuous metrics see [here](https://mverbakel.github.io/2021-02-12/two-sample-ttests). 
-
-Note, for ratio metrics (where the denominator is not the randomisation unit), and comparisons of the percentage change (also a ratio), the variance is not the same as that of an average. In these cases, the Delta method can be used, or alternatively bootstrapping. I talked more about this in my post on [confidence intervals](https://mverbakel.github.io/2021-03-05/confidence-intervals).
-
-### Common mis-interpretations
-
-- **Lack of power:** Often people will pick a standard runtime like 2 weeks without calculating the sample required for the effect size they're interested in. This can lead to under-powered experiments with little chance of detecting effects, even if meaningful effects exist. I think it's better to know this upfront, and trade-off your choices. More on this topic [here](https://mverbakel.github.io/2021-04-11/power-calculations).
-- **p-values:** Related to the above, a non-significant p-value is often incorrectly interpreted as meaning there is no effect. In reality, we can't prove an absence of an effect, and it's also possible the effect was just too small to detect with this test. Another common mistake is to think it's the probability the null is true (again false). The p-value assumes the null is true, then tells us how often we would expect a result at least as extreme as that observed. If it's unlikely, we take that as evidence towards the alternate being true. A lot more on this topic [here](https://mverbakel.github.io/2021-02-20/pvalues).
-- **Confidence intervals:** Similar to the p-value, confidence are also often misinterpreted. Though generally it's enough for stakeholders to understand it's a range of plausible values for the true population effect. More on this in this [post](https://mverbakel.github.io/2021-03-05/confidence-intervals).
-- **Peeking at p-values:** It's not uncommon for people to monitor running experiments, including the p-value results. To control the error rates, we pre-determine the runtime, and it's important that we wait till the end of the runtime to make a decision. The p-value can fluctuate, so stopping early (or later) when you see it's significant will increase the False Positive Rate. If this is unsatisfying, you can also consider sequential testing, but it's a lot less common in practice. 
-- **Multiple testing:** When one test is inconclusive, it's tempting to try other metrics, definitions, or segments to see if there was any effect. However, the more tests we run, the higher our false positive rate becomes. For example, if the FPR per test is 5% and we run 20 tests, the probability of at least one False Positive become 64.2% (see this [post](https://mverbakel.github.io/2021-02-20/pvalues) for the workings). One approach for experiments is to separate metrics into 3 groups with descending significance levels based on priority (e.g. primary can be 0.05, secondary 0.01, but third order should 0.001). The logic is based on how much we believe the null is true pre experiment. The stronger the belief, the lower the significance level you should use.
-
-### Analysing segments
-
-Given the effect of an experiment is not always uniform, it can be useful to break down the results for different segments. For example: market or country (e.g. could be different reactions by region, or localisation issues), device or platform (e.g. web/mobile/app, iOS/Android, and browser breakdowns can help with spotting bugs), time of day and day of week (plotting effects over time), user characteristics (did they join recently e.g. within last month, account type (single/shared, business/personal)). However, avoid comparing metrics for sub-segments that were impacted by the treatment. As users have shifted between the sub-segments, the differences observed are not necessarily only due to the treatment. For example, if your treatment increases bookings, comparing those who do and don't cancel will probably show different proportions of control/variant than expected.
-
-Differences in the effect by segment are called heterogeneous treatments effects (HTE), meaning the effect is not the same for all observations. Always think about whether the sub-segments are comparable though, as sometimes the differences may not be due to the treatment (e.g. the click through rate can differ for different operating systems because of different tracking technologies). If you are doing many breakdowns, also remember to correct for multiple testing. Alternatievly, one way to deal with this is to do many breakdowns (which could also be done with ML, e.g. a decision tree), identify and explore those that are interesting, and then validate them in a new experiment or with other methods on new data.
-
-**Simpson's paradox**
-
-Simpson's paradox is when we find different directions of association between small groups and the overall totals. It happens when we compare a treatment across two groups, and the proportions are not equal (e.g. doctor A treats more hard cases than doctor B, so even though doctor A has a higher success rate for both hard and easy cases, when the data is aggregated doctor B appears more successful). We can see this in experiments when ramping is used. For example, if we start with 1% in variant, then the next day increase to 50% in variant, even if the CR is higher in variant on both days, the table below shows how we end up with an overall negative effect (as day 1 counts more towards the control total). The problem is a higher proportion of the treatment observations are in day 2, and the conversion rate was in general lower on day 2.
-
-![Simpsons paradox with ramping](/assets/simpsons_paradox.png)
-Example from: [Kohavi et al., chapter 3](https://www.amazon.com/Trustworthy-Online-Controlled-Experiments-Practical/dp/1108724264)
-
-This can also happen when the sampling ratio varies by country, or some other variable (e.g. browser, or customer value segment) and the results are then combined. The message here is that you should be careful when aggregating data collected at different percentages.
-
-### Making a decision
-
-Our ultimate goal is to use the data we've collected to make a decision, to ship the change, or not to ship. This requires some context, and often draws on other sources of information as well. 
-
-**Considerations:**
-- Metric trade-offs: The direction of the effect can differ across metrics, meaning we need to make some trade-offs. E.g. if engagement metrics improve, but revenue decreases, should we ship? The answer will depend on the goals of the test, and by how much each changes.
-- Do the benefits outweigh the costs: We need to consider the cost of fully building out the feature (if not yet complete, e.g. MVP), and the potential maintenance costs (e.g. are we adding complexity that could cause more bugs in the future, or make it harder to change). 
-- Downsides of making a wrong decison: For example, if the change is temporary (like a limited time offer), then the cost of making a mistake is limited and we might set low bars for statistical and practical significance. 
-
-**Potential outcomes:**
-- Result is not statistically or practically significant: Iterate or abandon the idea. If the bounds are very wide, you likely don't have enough power to draw a strong conclusion. Consider running a follow-up experiment with more power.
-- The result is practically significant, but not statistically significant (the change could be meaningful, or not exist at all). Like in the previous case, we would need a follow-up experiment with more power.
-- Result is statistically and practically significant: Launch.
-- Result is statistically significant, but not practically significant: May not be worth launching, consider costs. If the bounds are wide (could be practically significant, could not be), then like before we can retest with more power.
-
-### Measuring long-term effects
-
-Measuring long term effects is always a challenge given we typically want to launch a successful change as soon as possible. There are two common approaches:
-- Proxies: Use short term metrics that are correlated with long term outcomes. For example, maybe 2 week retention is a good predictor of 1 year retention and so we can make our decision based on the 2 week result. Just give some thought as to whether you're treatment could notably change the relationship between the short and long term metrics you're using.
-- Holdouts: These are typically 6 or 12 month long experiments where you hold out a small % of your population from 1 or more launches to see the long term effect. Maintenance is the main downside here as holdouts can be corrupted by unexpected errors that render them unusable. It's also important to consider network effects between the holdout users and other users that might cause leakage (resulting in either an over or underestimated effect).
-
-## Other topics
+In general, the t-test or Welch's t-test is most common for comparing the means, and a z-test for proportions or a g-test are common for comparing proportions. For binary metrics, see [here](https://mverbakel.github.io/2021-02-13/two-sample-proportions), and for continuous metrics see [here](https://mverbakel.github.io/2021-02-12/two-sample-ttests). For ratio metrics (where the denominator is not the randomisation unit), and comparisons of the percentage change (also a ratio), the variance is not the same as that of an average. In these cases, the Delta method can be used, or alternatively bootstrapping ([see this post](https://mverbakel.github.io/2021-03-05/confidence-intervals)).
 
 ### Threats to experiment validity
 
@@ -185,7 +129,50 @@ Can the results be generalised to new people/situations/time periods beyond what
 - Changes in the effect of a treatment: e.g. the requirements and behaviours of customers can change drastically due to an external shock like a pandemic. Re-starting the experiment, or carefully excluding the event are options.
 
 **3) Statistical validity:**
-It's important that appropriate statistical tests are chosen (usually built-in to the company tool), but also that the assumptions of the test are met (see my [post](https://mverbakel.github.io/2021-04-03/metric-validation) for how to validate continuous metrics). However, often the most common mistakes are simple, e.g. not adhering to the runtime and/or stopping when significance is reached.
+Were appropriate statistical tests chosen (usually built-in to the company tool), and the assumptions of the test(s) met?
+
+### Common issues:
+- **Twyman's Law:** The more unusual or interesting the data, the more likely it is there was an error (i.e. errors such as logging issues, calculation errors, or missing/duplicated data are more common than truly large effects). Always treat those 'too good to be true' results with a healthy dose of skepticism.
+- **Lack of power:** Often people will pick a standard runtime like 2 weeks without calculating the sample required for the effect size they're interested in. This can lead to under-powered experiments with little chance of detecting effects, even if meaningful effects exist. I think it's better to know this upfront, and trade-off your choices. More on this topic [here](https://mverbakel.github.io/2021-04-11/power-calculations).
+- **p-values:** Related to the above, a non-significant p-value is often incorrectly interpreted as meaning there is no effect. In reality, we can't prove an absence of an effect, and it's also possible the effect was just too small to detect with this test. Another common mistake is to think it's the probability the null is true (again false). The p-value assumes the null is true, then tells us how often we would expect a result at least as extreme as that observed. If it's unlikely, we take that as evidence towards the alternate being true. A lot more on this topic [here](https://mverbakel.github.io/2021-02-20/pvalues).
+- **Confidence intervals:** Similar to the p-value, confidence are also often misinterpreted. Though generally it's enough for stakeholders to understand it's a range of plausible values for the true population effect. More on this in this [post](https://mverbakel.github.io/2021-03-05/confidence-intervals).
+- **Peeking at p-values:** It's not uncommon for people to monitor running experiments, including the p-value results. To control the error rates, we pre-determine the runtime, and it's important that we wait till the end of the runtime to make a decision. The p-value can fluctuate, so stopping early (or later) when you see it's significant will increase the False Positive Rate. If this is unsatisfying, you can also consider sequential testing, but it's a lot less common in practice. 
+- **Multiple testing:** When one test is inconclusive, it's tempting to try other metrics, definitions, or segments to see if there was any effect. However, the more tests we run, the higher our false positive rate becomes. For example, if the FPR per test is 5% and we run 20 tests, the probability of at least one False Positive become 64.2% (see this [post](https://mverbakel.github.io/2021-02-20/pvalues) for the workings). One approach for experiments is to separate metrics into 3 groups with descending significance levels based on priority (e.g. primary can be 0.05, secondary 0.01, but third order should 0.001). The logic is based on how much we believe the null is true pre experiment. The stronger the belief, the lower the significance level you should use.
+
+### Analysing segments
+
+The effect of an experiment is not always uniform (i.e. there are heterogeneous treatments effects), so it can be useful to break down the results for different segments. For example, market or country (e.g. could be different reactions by region, or localisation issues), device or platform (e.g. web/mobile/app, iOS/Android, and browser breakdowns can help with spotting bugs), time of day and day of week (plotting effects over time), user characteristics (did they join recently e.g. within last month, account type (single/shared, business/personal)). Some considerations:
+- Think about whether the sub-segments are comparable, as sometimes the differences may not be due to the treatment (e.g. the click through rate can differ for different operating systems because of different tracking technologies);
+- Use the pre-treatment values as users might change segment due to the treatment;
+- Avoid comparing segments that are not on the same unit as the randomisation (e.g. cancellation rate of bookers when you randomised visitors). These groups are not comparable anymore.
+- Correct for multiple testing. Alternatievly, one way to deal with this is to do many breakdowns (which could also be done with ML, e.g. a decision tree), identify and explore those that are interesting, and then validate them in a new experiment or with other methods on new data.
+- Simpson's paradox (different directions of association between small groups and the overall totals): This happens when we compare a treatment across two groups, and the proportions are not equal (e.g. doctor A treats more hard cases than doctor B, so even though doctor A has a higher success rate for both hard and easy cases, when the data is aggregated doctor B appears more successful). We can see this in experiments when the sampling ratio is different for different segments, or when ramping is used. For example, if we start with 1% in variant, then the next day increase to 50% in variant, even if the CR is higher in variant on both days, the table below shows how we end up with an overall negative effect (as day 1 counts more towards the control total). The problem is a higher proportion of the treatment observations are in day 2, and the conversion rate was in general lower on day 2.
+
+![Simpsons paradox with ramping](/assets/simpsons_paradox.png)
+Example from: [Kohavi et al., chapter 3](https://www.amazon.com/Trustworthy-Online-Controlled-Experiments-Practical/dp/1108724264)
+
+### Making a decision
+
+Our goal is to use the data we've collected to make a decision, to ship the change, or not to ship. 
+
+**Considerations:**
+- Metric trade-offs: The direction of the effect can differ across metrics, meaning we need to make some trade-offs. E.g. if engagement metrics improve, but revenue decreases, should we ship? The answer will depend on the goals of the test, and by how much each changes.
+- Do the benefits outweigh the costs: We need to consider the cost of fully building out the feature (if not yet complete, e.g. MVP), and the potential maintenance costs (e.g. are we adding complexity that could cause more bugs in the future, or make it harder to change). 
+- Downsides of making a wrong decison: For example, if the change is temporary (like a limited time offer), then the cost of making a mistake is limited and we might set low bars for statistical and practical significance. 
+
+**Potential outcomes:**
+- Result is not statistically or practically significant: Iterate or abandon the idea. If the bounds are very wide, you likely don't have enough power to draw a strong conclusion. Consider running a follow-up experiment with more power.
+- The result is practically significant, but not statistically significant (the change could be meaningful, or not exist at all). Like in the previous case, we would need a follow-up experiment with more power.
+- Result is statistically and practically significant: Launch.
+- Result is statistically significant, but not practically significant: May not be worth launching, consider costs. If the bounds are wide (could be practically significant, could not be), then like before we can retest with more power.
+
+## Other topics
+
+### Measuring long-term effects
+
+Measuring long term effects is always a challenge given we typically want to launch a successful change as soon as possible. There are two common approaches:
+- Proxies: Use short term metrics that are correlated with long term outcomes. For example, maybe 2 week retention is a good predictor of 1 year retention and so we can make our decision based on the 2 week result. Just give some thought as to whether you're treatment could notably change the relationship between the short and long term metrics you're using.
+- Holdouts: These are typically 6 or 12 month long experiments where you hold out a small % of your population from 1 or more launches to see the long term effect. Maintenance is the main downside here as holdouts can be corrupted by unexpected errors that render them unusable. It's also important to consider network effects between the holdout users and other users that might cause leakage (resulting in either an over or underestimated effect).
 
 ### Opt-in products
 
