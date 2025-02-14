@@ -6,3 +6,16 @@ mathjax: true
 
 Metric changed, what to do?
 What drives metric x?
+
+
+comparisons_and_associations
+
+covariance
+correlation
+...
+
+numerical vs numerical
+categorical vs categorical
+numerical vs categorical
+
+General questions: I have two samples, are they the same?
