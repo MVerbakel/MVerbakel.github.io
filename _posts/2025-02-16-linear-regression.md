@@ -413,7 +413,7 @@ $$\hat{\beta}_j \pm t_{\frac{\alpha}{2}, \, df} \cdot \text{SE}(\hat{\beta}_j)$$
 Where:
 - $$\hat{\beta}_j$$ is the estimated coefficient for feature j
 - $$t_{\frac{\alpha}{2}, \, df}$$ is the critical t-value for the desired confidence level, with df degrees of freedom. 
-- \text{SE}(\hat{\beta}_j) is the standard error, as calculated in the above section
+- $$\text{SE}(\hat{\beta}_j)$$ is the standard error, as calculated in the above section
 
 To determine the critical value, we have to decide the confidence level (1-alpha). Typically in a business context the confidence is set at 95% (alpa=0.05) or 90% (alpha=0.1). The higher the confidence required, the wider the confidence interval will be to increase the chances of capturing the population value. Noting, the actual value may or may not be in the range for our given sample. Coming back to the sampling distribution (distribution of coefficient estimates across multiple samples), if we placed the resulting distance around each estimate we would see that 95% of the time (for alpha=0.05) the true value is within the interval. The other 5% of the time, we have a particularly high or low estimate (by chance) and miss the actual value. 
 
