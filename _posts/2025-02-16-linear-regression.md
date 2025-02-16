@@ -4,7 +4,7 @@ title: "Linear regression (theory review)"
 mathjax: true
 ---
 
-Linear regression is a model for predicting a continuous outcome (dependent variable), from a set of features (independent variable/s). For example, you could use it on past home sales data to predict the price of a new listing. The outcome would be the sale price, and the predictors could be things like the number of bedrooms and size of the house. While the true relationships between these features and the outcome in the real world are likely complex, we can often get a reasonable approximation with a simple additive linear model. If you think of each row in the data set as an equation, we want to figure out what (linear) combination of the features we should take to get a value as close as possible to the actual sale prices. Given it's simplicity, efficiency and interpretability, it's one of the most commonly used models in practice. However, it can produce biased or inaccurate estimates when the assumptions are not met, so it's important to properly review the model fit and interpret the results correctly.
+Linear regression is a model for predicting a continuous outcome (dependent variable), from a set of features (independent variable/s). For example, you could use it on past home sales data to predict the price of a new listing. The outcome would be the sale price, and the predictors could be things like the number of bedrooms, and size of the house. While the true relationships between these features and the outcome in the real world are likely complex, we can often get a reasonable approximation with a simple additive linear model. If you think of each row in the data set as an equation, we want to figure out what (linear) combination of the features we should take to get a value as close as possible to the actual sale prices. Given it's simplicity, efficiency and interpretability, it's one of the most commonly used models in practice. However, it can produce biased estimates and inaccurate statistical inference when the assumptions are not met, so it's important to properly review the model fit and interpret the results correctly. This post is mostly for myself to refer back to, so be warned it's very long!
 
 ## Intuition
 
@@ -16,7 +16,7 @@ When we have multiple features, we're doing the same thing but in a multi-dimens
 
 ## Ordinary Least Squares (OLS)
 
-OLS finds the combination of the features that minimises the sum of the squared residuals. Let's break that down. Given the feature values (X's), we want to determine the weights (coefficients or $$\beta$$), that when applied to our training data gives us a predicted values ($$\hat{Y}$$) as close as possible to the actual sale prices (Y). This makes it a supervised parametric model, as it requires the actual outcomes for the training data (supervised), and assumes a linear relationship between the features and the outcome with a fixed set of parameters (the coefficients, making it parametric). This gives us the following:
+OLS finds the combination of the features that minimises the sum of the squared residuals (RSS). Let's break that down. Given the feature values (X's), we want to determine the weights (coefficients or $$\beta$$), that when applied to our training data gives us a predicted values ($$\hat{Y}$$) as close as possible to the actual sale prices (Y). This makes it a supervised parametric model, as it requires the actual outcomes for the training data (supervised), and assumes a linear relationship between the features and the outcome with a fixed set of parameters (the coefficients, making it parametric). Giving the following:
 
 $$\hat{Y} = \hat{\beta_0} + \hat{\beta_1} * X_1 + ... + \hat{\beta_n} * X_n$$
 
@@ -36,7 +36,7 @@ Where:
 
 ### Ideal case
 
-To understand how it works, let's first create a play example where the outcome Y is a linear combination of the inputs X. The data set is just a matrix, so a system of linear equations like this can be solved by linear algebra with elimination. We simplify the equations by subtracting multiples of rows from each other (noting this doesn't change the relationship between the X's and Y as we're doing the same to both sides), until we have an upper triangular matrix (0's below diagonal). At that point, the last row has only one unknown, which we can easily solve knowing the output. Then we just work backwards up the triangle to solve the remaining, as each time there will be only one unknown (having solved the others). 
+To understand how it works, let's first create a play example where the outcome Y is a linear combination of the inputs X. The data set is just a matrix, so we can try to solve the system of linear equations with linear algebra using elimination. We simplify the equations by subtracting multiples of rows from each other (noting this doesn't change the relationship between the X's and Y as we're doing the same to both sides), until we have an upper triangular matrix (0's below diagonal). At that point, the last row has only one unknown, which we can easily solve knowing the output. Then we just work backwards up the triangle to solve the remaining, as each time there will be only one unknown (having solved the others). 
 
 <img src="/assets/example_linear_equations.png" alt="matrix" width="70%"/>
 
@@ -77,7 +77,7 @@ Conditions to compute:
 
 When you're working with large data sets and many features, the normal equation approach becomes computationally infeasible. Optimisation algorithms such as Gradient Descent find an approximate solution to OLS by iteratively adjusting the model parameters ($$\beta$$, including the intercept) to minimise the Mean Squared Error (MSE). We use MSE instead of the sum (RSS), as averaging the error (scaling by 1/m) reduces the magnitude of the gradient, making the computations easier and convergence smoother.
 
-The basic idea is to start with some values for the unknown model parameters ($$\beta$$ coefficients), either small random numbers or 0, and gradually change them depending on whether the outcome was over or under predicted (using the derivative of the function to determine the direction of the slope). With multiple features, we compute the gradient of the cost function with respect to each $$\beta$$, but then the update rule is applied simultaneously. Meaning we optimise all of them at once in each step. The process is repeated for a fixed number of steps or until the convergence criteria is met (change in the cost function is smaller than a cutoff). We can set the size of each step with the learning rate ($$\alpha$$): too small a step will take a long time, while too large a step can cause it to fail to converge (keep overshooting). 
+The basic idea is to start with some values for the unknown model parameters ($$\beta$$ coefficients), either small random numbers or 0, and gradually change them depending on whether the outcome was over or under predicted (using the derivative of the function to determine the direction of the slope). With multiple features, we compute the gradient of the cost function with respect to each $$\beta$$, but then the update rule is applied simultaneously. Meaning we optimise all of them at once in each step. The process is repeated for a fixed number of steps or until the convergence criteria is met (change in the cost function is smaller than a cutoff).
 
 **Cost function**:
 $$J(\beta) = \frac{1}{m} \sum_{i=1}^{m} (y_i - \hat{y}_i)^2$$ or equivelantly $$J(\beta) = \frac{1}{m} (y - X \beta)^T (y - X \beta)$$
@@ -85,12 +85,12 @@ $$J(\beta) = \frac{1}{m} \sum_{i=1}^{m} (y_i - \hat{y}_i)^2$$ or equivelantly $$
 **Update rule**:
 $$\beta := \beta + \frac{2\alpha}{m} X^T (y - X\beta)$$
 
-This is demonstrated in the image below using just one feature ($$\theta_1$$) and the intercept ($$\theta_0$$). Each star represents a step (the distance determined by $$\alpha$$), and the arrows point to the minimum. The direction in which the step is taken is determined by the partial derivative of J(0,1). Depending on where one starts on the graph, one could end up at different points.
+We can set the size of each step with the learning rate ($$\alpha$$): too small a step will take a long time, while too large a step can cause it to fail to converge (keep overshooting). This is demonstrated in the image below using just one feature ($$\theta_1$$) and the intercept ($$\theta_0$$). Each star represents a step (the distance determined by $$\alpha$$), and the arrows point to the minimum. The direction in which the step is taken is determined by the partial derivative of J(0,1). Depending on where one starts on the graph, one could end up at different points.
 
 <img src="/assets/gradient_descent.png" alt="gradient descent" width="70%"/> 
 Source: [Supervised Machine Learning: Regression and Classification](https://www.coursera.org/learn/machine-learning)
 
-As the squared error in OLS is quadratic (convex), there is only one global minimum. This means Gradient Descent will always converge when applied to OLS (assuming learning rate appropriate), and should produce the same solution as the normal equation. In practice, there may be differences depending on the stopping criteria and learning rate.
+As the squared error in OLS is quadratic (convex), there is only one global minimum. This means Gradient Descent will always converge when applied to OLS, and should produce the same solution as the normal equation. In practice, there may be differences depending on the stopping criteria and learning rate.
 
 <img src="/assets/learning_rates_gd.png" alt="alpha impact" width="60%"/> 
 Source: [Supervised Machine Learning: Regression and Classification](https://www.coursera.org/learn/machine-learning)
@@ -108,15 +108,15 @@ Regardless of how it's fit, OLS relies on several key assumptions. These can be 
 - **1) Model fit and data assumptions (linearity, no perfect multicollinearity, no endogeneity, no measurement error)**: These primarily affect the accuracy of the estimates themselves, making coefficients and predictions potentially biased (systematically over- or under-estimated) and inconsistent (not converging to true values even with larger samples). Violations of these assumptions lead to incorrect relationships being modeled, resulting in the estimates being systematically off.
 - **2) Error term assumptions (zero mean, independence, homoscedasticity, normality)**: These primarily impact the reliability of statistical inference, such as hypothesis tests and confidence intervals. Violations of these assumptions affect precision (efficiency), leading to inefficient estimates (larger standard errors and wider confidence intervals), though they may not necessarily cause bias in the coefficients themselves. In other words, the estimates might still be unbiased but less precise.
 
-Below is a more detailed summary of each assumption, how to assess it and how to potentially correct it:
+Below is a more detailed summary of each assumption, how to assess it, and how to potentially correct it:
 
 <img src="/assets/ols_assumptions_pt1.png" alt="assumptions table" width="100%"/> 
 
 <img src="/assets/ols_assumptions_pt2.png" alt="assumptions table" width="100%"/> 
 
-### Causal map
+## Causal map
 
-At the very start, it can be useful to draw a mind map of all the features and how they are related to both each other and the outcome (including those you don't have). This will help you understand how much of the outcome you are likely to be able to explain, as well as how to interpret the results (e.g. if there are important missing features and they're correlated with features you're including, they could influence their coefficients). This is also a good checkpoint to consider whether this is a problem you should proceed with. Given the potential outcomes, what actions can you take? Are the features things you can change or influence? What would your stakeholder do if the result is that X, Y, Z are influential. Are you framing this problem correctly, does it address the real question? 
+This is touched on under the no endogeneity assumption, but at the very start it can be useful to draw a mind map of all the features and how they are related to both each other and the outcome (including those you don't have). This will help you understand how much of the outcome you are likely to be able to explain, as well as how to interpret the results (e.g. if there are important missing features and they're correlated with features you're including, they could influence their coefficients). This is also a good checkpoint to consider whether this is a problem you should proceed with. Given the potential outcomes, what actions can you take? Are the features things you can change or influence? What would your stakeholder do if the result is that X, Y, Z are influential. Are you framing this problem correctly, does it address the real question? 
 
 ## Evaluating the model
 
@@ -124,7 +124,7 @@ When evaluating the model, we want to assess whether we have a "good" model, mea
 
 ### Split the data
 
-To assess the predictive accuracy on unseen data you typically set aside some of your observations before you start the modelling process. This be a fixed split (e.g. 80% used for training, 20% held out for testing), or you can use k-fold cross validation (train on k-1 folds and test on the remaining, repeating k times). The benefit of the cross validation approach being that we can use all of the data for training (more efficient), and we're less likely to overfit as we're splitting multiple times and averaging over these to understand the performance. However, it's more computationally expensive, so better for smaller data sets (k is typically 5-10, but stability and cost increase with k).
+To assess the predictive accuracy on unseen data you typically set aside some of your observations before you start the modelling process. This can be a fixed split (e.g. 80% used for training, 20% held out for testing), or you can use k-fold cross validation (train on k-1 folds and test on the remaining, repeating k times). The benefit of the cross validation approach being that we can use all of the data for training (more efficient), and we're less likely to overfit as we're splitting multiple times and averaging over these to understand the performance. However, it's more computationally expensive, so better for smaller data sets (k is typically 5-10, but stability and cost increase with k).
 
 ### Metrics
 
@@ -133,6 +133,8 @@ Below are the most common metrics you'll compute. The performance metrics (R², 
 <img src="/assets/ols_metrics_common.png" alt="projection" width="65%"/> 
 
 <img src="/assets/ols_metrics.png" alt="projection" width="100%"/> 
+
+An important distinction to make is whether your primary goal is to make a prediction, or to interpret associations. If you want to apply some treatment/change/action to new cases/customers based on the predicted outcome, then you have a prediction problem and will focus more on the performance metrics. If you're primarily interested in understanding past outcomes, and what features were most important in deciding the outcome, then you have an interpretation problem and may be ok with lower performance metrics so long as you accurately capture the relationships of interest.
 
 ### Residual Plots
 
@@ -143,25 +145,29 @@ The most common residual diagnostic plots are:
 - **Scale-Location Plot (or Spread-Location Plot):** Specifically focuses on heteroscedasticity by displaying the spread of residuals across fitted values, using the square root of standardized residuals on the y-axis. This helps make the variance of residuals more comparable across the range of fitted values. The square root helps stabilize the variance and makes deviations from constant variance more apparent. Points should be evenly spread along the y-axis. A trend (e.g. increasing or decreasing spread) indicates heteroscedasticity, where variance of residuals is not constant.
 - **Residual vs X Plot**: Used to check for non-linearity, unequal variance (heteroscedasticity), and endogeneity. Residuals should be randomly scattered around the zero line with no patterns or outliers. For example: patterns like a U-shape indicates the model might be missing an important non-linear relationship; if the spread is increasing/decreasing (like a fan), the variance of residuals is not constant across all levels of the predicted values (heteroscedasticity).
 
-Below are some examples of how the plots might look for well behaved (normal) residuals (row 1) vs with different issues. Starting with the histogram and QQ plots, which assess whether residuals follow a normal distribution. In the normal example, the residuals are bell shaped and roughly follow the line in the QQ plot, supporting the normality assumption. However, in the quadratic example, the residuals show a curve, suggesting the model isn’t capturing the non-linear relationship. The right-skewed and left-skewed examples reveal asymmetric distributions in the residuals, indicating potential model issues like omitted variables or incorrect transformations. The Residual vs Fitted plot helps detect heteroscedasticity, where the variance of residuals changes with fitted values; in the heteroscedasticity example, the spread of residuals increases, signaling a violation of constant variance. The Scale-Location plot further examines the spread of residuals. In the outlier example, we see large deviations, which could be due to influential data points. The bimodal example highlights a multi-modal distribution of residuals, suggesting that the model may be missing important factors. 
+Below are some examples of how the plots might look for well behaved (normal) residuals (row 1) vs with different issues. Starting with the histogram and QQ plots, which assess whether residuals follow a normal distribution. In the normal example, the residuals are bell shaped and roughly follow the line in the QQ plot, supporting the normality assumption. However, in the quadratic example, the residuals show a slight curve at the extreme, suggesting the model isn’t capturing the non-linear relationship. The right-skewed and left-skewed examples reveal asymmetric distributions in the residuals, indicating potential model issues like omitted variables or incorrect transformations. The Residual vs Fitted plot helps detect heteroscedasticity, where the variance of residuals changes with fitted values; in the heteroscedasticity example, the spread of residuals increases, signaling a violation of constant variance. The Scale-Location plot further examines the spread of residuals. In the outlier example, we see large deviations, which could be due to influential data points. The bimodal example highlights a multi-modal distribution of residuals, suggesting that the model may be missing important factors. 
 
 <img src="/assets/residual_plots.png" alt="residual plots" width="100%"/> 
 
 ## Iterating on the model
 
-Based on the above evaluation you'll likely identify some possible improvements or issues that need to be resolved in a new iteration of the model. Below I'll cover some of the topics that come up at this stage: outliers; and, feature selection.
+Based on the above evaluation you'll likely identify some possible improvements or issues that need to be resolved in a new iteration of the model. Below I'll cover some of the topics that come up at this stage: outliers; standardising features; and, feature selection.
 
 ### Handling outliers
 
-Outliers are typically identified during the residual diagnostics, but can be more formally defined using Cook's distance or leverage. You can remove the outliers (if erroneous, e.g. entry error), cap/winsorize the values (e.g. at the 5/95th percentile), or replace them with the mean. Whichever method you use, investigate a bit first to figure out the cause of the outlier, as they can reflect genuine phenomena in the data which you don't want to remove. For example, travel agents might look like outlier customers in hotel bookings data. They likely behave differently so it might be better to model them separately or use interaction terms. In general, splitting the data into separate models for businesses and individuals is likely the most straightforward and interpretable solution, especially if the customer types have fundamentally different behaviors. If you want to keep everything in one model, consider using interaction terms to account for the different patterns and the outliers. For cases where the outliers are more random, capping is a simple, fast, and effective option to limit extreme values. However, it loses data and can introduce bias if the wrong thresholds are chosen. An alternative option is using a robust regression method (covered later), which modifies the model instead.
+Outliers are typically identified during the residual diagnostics, but can be more formally defined using Cook's distance or leverage. You can remove the outliers (if erroneous, e.g. entry error), cap/winsorize the values (e.g. at the 5/95th percentile), or replace them with the mean. Whichever method you use, investigate a bit first to figure out the cause of the outlier, as they can reflect genuine phenomena in the data which you don't want to remove. For example, travel agents might look like outlier customers in hotel bookings data. They likely behave differently so it might be better to model them separately or use interaction terms. In general, splitting the data into separate models for businesses and individuals is likely the most straightforward and interpretable solution, especially if the customer types have fundamentally different behaviors. However, if you want to keep everything in one model, consider using interaction terms to account for the different patterns and the outliers. For cases where the outliers are more random, capping is a simple, fast, and effective option to limit extreme values. However, there is data loss and it can introduce bias if the wrong thresholds are chosen. An alternative option is using a robust regression method (covered later), which modifies the model instead.
+
+### Standardised features
+
+If you want to compare the coefficients, then it's useful to put them all on the same scale by standardising the values before fitting the model (i.e. x - mean / std deviation). Then they can be ranked based on their absolute magnitude to understand which features have the largest effect on the outcome. Just keep in mind there's still the issue of whether the coefficients are unbiased, and you'll want to only consider those that are significant (covered later).
 
 ### Feature Selection
 
-If multicollinearity is an issue, a common solution is to reduce the feature set. However, a simpler model with fewer features is also generally more desirable in terms of efficiency, interpretability, and performance (reducing risk of overfitting). Therefore, feature selection is a typical step. It can be done in a few ways: stepwise selection (forward/backward/bi-directional); regularisation of the coefficients (lasso/ridge/elastic net); Principal Components Analysis (PCA); or, Partial Least Squares. Each has pros and cons, so it will depend on your problem and goals.
+If multicollinearity is an issue, a common solution is to reduce the feature set. However, in general a simpler model with fewer features is more desirable in terms of efficiency, interpretability, and performance (reducing risk of overfitting). It can be done in a few ways: stepwise selection (forward/backward/bi-directional); regularisation of the coefficients (lasso/ridge/elastic net); Principal Components Analysis (PCA); or, Partial Least Squares. Each has pros and cons, so it will depend on your problem and goals.
 
 ### 1. Stepwise selection
 
-Stepwise selection involves iteratively fitting models with more/less features and checking some criterion to decide if the model performance is still improving beyond some threshold (e.g. AIC/BIC, adjusted $$R^2$$). These are easy to understand methods, but they're computationally expensive (fitting many models), and can give inconsistent selections (sensitive to changes in data, may overfit the training data, depend on the starting point of forwards/backwards, and struggle with correlated features). The issue for correlated features is the coefficients may not be accurate, with high variance, when both are included in the model. Therefore, we might pick one over the other (when both are equally important), or include both when they're redundant. This is particularly an issue if we are using the model to understand which features are most important.
+Stepwise selection involves iteratively fitting models with more/less features and checking some criterion to decide if the model performance is still improving beyond some threshold (e.g. AIC/BIC, adjusted $$R^2$$). These are easy to understand methods, but they're computationally expensive (fitting many models), and can give inconsistent selections (sensitive to changes in data, may overfit the training data, depend on the starting point of forwards/backwards, and struggle with correlated features). For correlated features they might pick one over the other (when both are equally important), or include both when they're redundant. This is particularly an issue if we are using the model to understand which features are most important.
 
 #### Forward (iteratively add)
 
@@ -177,12 +183,12 @@ Start with an empty model (intercept only), then add the most significant featur
 
 ### 2. Regularisation
 
-Regularisation methods add a penalty term to the loss function based on the coefficients, meaning we minimise both the RSS and the magnitude of the coefficients. The goal is to create a simpler model that generalizes well to unseen data. There's a bias-variance trade-off here, we sacrifice some accuracy on the training data (i.e. increase bias), to reduce variance and improve prediction accuracy on the test data. There are 3 main methods: 1) Lasso (L1) adds a penalty proportional to the absolute value of the coefficients (some go to exactly 0); 2) Ridge (L2) adds a penalty proportional to the square of the coefficients (shrinks all, but not to 0); and, 3) Elastic Net combines L1 and L2. 
+Regularisation methods add a penalty term to the loss function based on the coefficients, meaning they minimise both the RSS and the magnitude of the coefficients. Feature scaling (typically standardisation) is essential to avoid features with a larger range dominating the penalty term. The goal is to create a simpler model that generalizes well to unseen data. There's a bias-variance trade-off here though, we sacrifice some accuracy on the training data (i.e. increase bias), to reduce variance and improve prediction accuracy on the test data. There are 3 main methods: 1) Lasso (L1) adds a penalty proportional to the absolute value of the coefficients (some go to exactly 0 as demonstrated below); 2) Ridge (L2) adds a penalty proportional to the square of the coefficients (shrinks all, but not to 0); and, 3) Elastic Net combines L1 and L2. 
 
 <img src="/assets/regularisation_comparison.jpeg" alt="l1 vs l2" width="80%"/> 
 Source: [PennState Stat 897D](https://online.stat.psu.edu/stat857/node/158/)
 
-Feature scaling (typically standardisation) is essential to avoid features with a larger range dominating the penalty term. The strength of the regularisation is controlled by the parameter lambda ($$\lambda$$). Close to 0 (e.g. 0.01) there will be minimal regularisation (coefficients similar to without), around 1-5 there will be some shrinkage of the coefficients, and at large values (e.g. 10-100) there will be a lot of shrinkage and possibly all 0's in the case of Lasso. Usually the value would be selected based on a grid search (test a set of values e.g. 0.001, 0.01, 0.1, 1, 10), potentially with cross-validation (to ensure generalises well). If you're interested in feature importance, you might consider using Lasso regularisation as a pre-processing step (remove the features that became 0). The coefficients after regularisation are biased (shrunk), so we then want to re-fit the model with the reduced feature set.
+The strength of the regularisation is controlled by the parameter lambda ($$\lambda$$). Close to 0 (e.g. 0.01) there will be minimal regularisation (coefficients similar to without), around 1-5 there will be some shrinkage of the coefficients, and at large values (e.g. 10-100) there will be a lot of shrinkage and possibly all 0's in the case of Lasso. Usually the value would be selected based on a grid search (test a set of values e.g. 0.001, 0.01, 0.1, 1, 10), potentially with cross-validation (to ensure generalises well). 
 
 #### Lasso (L1)
 
@@ -195,6 +201,8 @@ Where:
 - $$\lambda$$ is the regularisation parameter (lambda)
 - $$\beta_j$$ are the feature coefficients
 - p is the number of features
+
+If you're interested in feature importance, you might consider using Lasso regularisation as a pre-processing step (remove the features that became 0). The coefficients after regularisation are biased (shrunk), so we then want to re-fit the model with the reduced feature set.
 
 #### Ridge (L2)
 
@@ -229,15 +237,11 @@ Another solution is to replace the features with the first k components from a P
 
 Partial Least Squares (PLS) is another dimensionality reduction technique. Like PCA it creates linear combinations of the features (components) by projecting them onto a lower dimensional space. However, it searches for components that explain as much as possible of the covariance between X and Y, so it directly considers the relevance to Y in the process. Like PCA though, you still need to decide how many components to keep, and it can be hard to interpret if you want to understand the relationship of the original features with the outcome. 
 
-## Statistical inference on the coefficients
+## Statistical inference
 
-An important distinction to make is whether your primary goal is to make a prediction, or to interpret associations. If your primary objective is to apply some treatment/change/action to new cases/customers based on the predicted outcome, then you have a prediction problem and will focus on the performance of your model in making those predictions (e.g. predicting the expected profit to decide whether to give a customer an incentive such as a discount). However, even in these cases, you will often still want some level of interpretation (e.g. legal/stakeholder requirements to explain predictions, or to identify issues/bias in the model that can be improved). If you are primarily interested in understanding past outcomes, and what features were most important in deciding the outcome, then you have an interpretation problem (e.g. identifying factors that drive a metric such as the number of active customers per month, or finding factors associated with high performance to understand who/what you should target for new acquisitions). For these problems, we care less about how well we can predict the outcome and more about the associations between some set of the features and the outcome. While we typically are interested in causal questions (how does feature X affect Y), we may only find what features are associated with the outcome using linear regression.
+When interpreting the coefficients, we typically have causal questions in mind (how does feature X affect Y), but we may only find what features are associated with the outcome using linear regression. However, this can still be very insightful, and spur further analysis to validate hypotheses.
 
-### Standardised features
-
-If you want to compare the coefficients, then it's useful to put them all on the same scale by standardising the values before fitting the model (i.e. x - mean / std deviation). Then they can be ranked based on their absolute magnitude to understand which features have the largest effect on the outcome. Just keep in mind there's still the issue of whether the coefficients are unbiased, and you'll want to only consider those that are significant (covered later).
-
-### Interpreting the coefficients
+### Coefficients
 
 Let's say we fit the following model:
 
@@ -261,8 +265,7 @@ $$Income_i = 30 + 5*Gender + 2*Experience$$
 
 #### Interaction term
 $$Income_i = 30 + 5*Gender + 2*Experience + 500(Gender*Experience)$$
-- Gender is coded 1=Male and 0=Female, all values in '000's
-- The intercept is unchanged, it tells us females with 0 years experience have an income of 30K on average.
+- The intercept is unchanged.
 - $$\hat{\beta}_1$$=5K tells us the difference in female and male income for individuals with 0 years experience (males earn 5K more).
 - $$\hat{\beta}_2$$=2K tells us each year of experience is expected to add +2K when gender=0 (i.e. for females).
 - $$\hat{\beta}_3$$=500 is the difference in the effect of experience on income by gender (combined effect): for males we expect an extra +500 increase in income for every year of experience (on top of the 2K from $$\hat{\beta}_2$$).
@@ -272,7 +275,7 @@ $$Income_i = 30 + 5*Gender + 2*Experience + 500(Gender*Experience)$$
 
 #### Quadratic term
 $$Income_i = 30 + 5*Gender + 1*Age + -0.01*Age^2$$
-- Notes: Gender is coded 1=Male and 0=Female, all values in '000's
+- The intercept is unchanged.
 - $$\hat{\beta}_1$$=5K tells us the difference in female and male income, holding age constant (males expected to have +5K).
 - $$\hat{\beta}_2$$=1K tells us we expect +1K income for every additional year of age at the younger ages (before taking into account the quadratic effect), holding gender constant. 
 - $$\hat{\beta}_2$$=-10 tells us the rate at which income increases, decreases with age and eventually reverses (concave).
@@ -283,7 +286,7 @@ Adding higher order polynomials is the same, but capturing the higher order effe
 
 ### Standard errors
 
-The coefficient estimates are based on one sample, so like with all sample statistics, we want to know how much these estimates might vary from sample to sample. The standard error is exactly this, it gives us a measure of the uncertainty of the estimate. This is then used to construct confidence intervals and do significance tests. The larger the standard error, the higher the uncertainty, and the wider the confidence intervals.
+The coefficient estimates are based on one sample, so like with all sample statistics we want to know how much these estimates might vary from sample to sample. The standard error is exactly this, it gives us a measure of the uncertainty of the estimate. This is then used to construct confidence intervals and do significance tests. The larger the standard error, the higher the uncertainty, and the wider the confidence intervals.
 
 The standard error is the square root of the variance, calculated as follows:
 
@@ -536,7 +539,7 @@ These methods don't directly modify the data, instead adapting the model fitting
 
 ## Summary
 
-OLS is a simple, yet powerful technique for estimating the parameters of a linear regression model, but it relies on several assumptions to be effective. Other than misspecifications of the model (e.g. non-linear relationships, or omitted variables), the main limitation is it's sensitivity to outliers. While it is widely used in practice due to its efficiency and ease of interpretation, it is important to check whether the assumptions hold in a given dataset to ensure valid and reliable results. More complex models may better fit the data in some cases (e.g. Random Forest or XGBoost), which can be combined with something like SHAP for interpretation. However, in both cases, you should be careful to understand the data and model well if you're trying to make causal claims about the relationships between the features and the outcome.  
+OLS is a simple, yet powerful technique for estimating the parameters of a linear regression model, but it relies on several assumptions to be effective. Other than misspecifications of the model (e.g. non-linear relationships, or omitted variables), the main limitation is it's sensitivity to outliers. While it is widely used in practice due to its efficiency and ease of interpretation, it is important to check whether the assumptions hold in a given dataset to ensure valid and reliable results. More complex models may better fit the data in some cases (e.g. Random Forest or XGBoost), which can be combined with something like SHAP for interpretation. However, even then, you should be careful to understand the data and model if you're trying to make causal claims about the relationships between the features and the outcome. In these cases it's useful to use regression to generate hypotheses, but then use other methods to validate (e.g. randomised experiments).
 
 ## References:
 - For a more detailed refresher on Linear Algebra, Strang's [MIT course](https://ocw.mit.edu/courses/mathematics/18-06sc-linear-algebra-fall-2011/ax-b-and-the-four-subspaces/) is very good. Note, there's no need to scale the features when using the normal equation.
