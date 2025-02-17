@@ -118,7 +118,7 @@ Below is a more detailed summary of each assumption, how to assess it, and how t
 
 This is touched on under the no endogeneity assumption, but at the very start it can be useful to draw a causal map of all the features and how they are related to each other and the outcome (including those you don't have). This can be as simple as writing down the outcome, then adding the common factors (features) that might influence it, with lines and arrows to show the expected relationship. Next you can add unmeasured (or difficult to measure) factors that might influence either the outcome or features. This process helps you understand how much of the outcome you are likely to be able to explain, allows you to be explicit in your assumptions, and can help you with interpreting the results. Using a very simplified example, if you predicted the rates of violence based on the size of the police force, you may conclude they're positively correlated (more police equals more violence) because you're missing the confounder of crime rate (higher crime equals more police and more violence). 
 
-<img src="/assets/causal_map.png" alt="causal map" width="100%"/> 
+<img src="/assets/causal_map.png" alt="causal map" width="30%"/> 
 
 This is also a good checkpoint to consider whether this is a problem you should proceed with. Given the potential outcomes, what actions can you take? Are the features things you can change or influence? What would your stakeholder do if the result is that X, Y, Z are influential. Are you framing this problem correctly, does it address the real question? 
 
