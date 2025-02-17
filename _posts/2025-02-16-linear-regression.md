@@ -4,7 +4,7 @@ title: "Linear regression (theory review)"
 mathjax: true
 ---
 
-Linear regression is a model for predicting a continuous outcome (dependent variable), from a set of features (independent variable/s). For example, you could use it on past home sales data to predict the price of a new listing. The outcome would be the sale price, and the predictors could be things like the number of bedrooms, and size of the house. While the true relationships between these features and the outcome in the real world are likely complex, we can often get a reasonable approximation with a simple additive linear model. If you think of each row in the data set as an equation, we want to figure out what (linear) combination of the features we should take to get a value as close as possible to the actual sale prices. Given it's simplicity, efficiency and interpretability, it's one of the most commonly used models in practice. However, it can produce biased estimates and inaccurate statistical inference when the assumptions are not met, so it's important to properly review the model fit and interpret the results correctly. This post is mostly for myself to refer back to, so be warned it's very long!
+Linear regression is a model for predicting a continuous outcome (dependent variable), from a set of features (independent variable/s). For example, you could use it on past home sales data to predict the price of a new listing. The outcome would be the sale price, and the predictors could be things like the number of bedrooms, and size of the house. While the true relationships between these features and the outcome in the real world are likely complex, we can often get a reasonable approximation with a simple additive linear model. If you think of each row in the data set as an equation, we want to figure out what (linear) combination of the features we should take to get a value as close as possible to the actual sale prices. Given it's simplicity, efficiency and interpretability, it's one of the most commonly used models in practice. However, it can produce biased estimates and inaccurate statistical inference when the assumptions are not met, so it's important to properly review the model fit and interpret the results correctly. 
 
 ## Intuition
 
@@ -116,7 +116,7 @@ Below is a more detailed summary of each assumption, how to assess it, and how t
 
 ## Causal map
 
-This is touched on under the no endogeneity assumption, but at the very start it can be useful to draw a mind map of all the features and how they are related to both each other and the outcome (including those you don't have). This will help you understand how much of the outcome you are likely to be able to explain, as well as how to interpret the results (e.g. if there are important missing features and they're correlated with features you're including, they could influence their coefficients). This is also a good checkpoint to consider whether this is a problem you should proceed with. Given the potential outcomes, what actions can you take? Are the features things you can change or influence? What would your stakeholder do if the result is that X, Y, Z are influential. Are you framing this problem correctly, does it address the real question? 
+This is touched on under the no endogeneity assumption, but at the very start it can be useful to draw a causal map of all the features and how they are related to both each other and the outcome (including those you don't have). This can be as simple as writing down the outcome, then adding the common factors (features) that might influence it with lines and arrows to show the expected relationship. Next you can add unmeasured (or difficult to measure) factors that might influence either the outcome or features. This process helps you understand how much of the outcome you are likely to be able to explain, allows you to be explicit in your assumptions, and can help you with interpreting the results (e.g. if there are important missing features and they're correlated with features you're including, they could influence their coefficients). This is also a good checkpoint to consider whether this is a problem you should proceed with. Given the potential outcomes, what actions can you take? Are the features things you can change or influence? What would your stakeholder do if the result is that X, Y, Z are influential. Are you framing this problem correctly, does it address the real question? 
 
 ## Evaluating the model
 
@@ -239,7 +239,7 @@ Partial Least Squares (PLS) is another dimensionality reduction technique. Like 
 
 ## Statistical inference
 
-When interpreting the coefficients, we typically have causal questions in mind (how does feature X affect Y), but we may only find what features are associated with the outcome using linear regression. However, this can still be very insightful, and spur further analysis to validate hypotheses.
+When interpreting the coefficients, we typically have causal questions in mind (how does feature X affect Y), but in most cases we'll only find what features are associated with the outcome using linear regression. While it's possible to use linear regression to get causal estimates (e.g. with data from a randomised trial), if we're using observational data it's very difficult to know if we've controlled for all confounders. However, it's still a very useful technique for generating hypotheses that we can then try to validate with other methods.
 
 ### Coefficients
 
@@ -360,6 +360,7 @@ The standard error depends on the variance of the error term, and so it's accura
 This corrects for heteroscedasticity (non-constant variance in the residuals) by adjusting the calculation of the variance-covariance matrix. Instead of assuming the error variance is constant like above ($$\hat{\sigma}^2$$ = the sum of squared residuals divided by dof), we allow the error variance to vary across the observations by creating a diagonal matrix of the squared residuals (i.e. an nxn matrix with the squared residuals on the diagonal and 0's off). This is then used to calculate the variance:
 
 $$\hat{V}_{\text{White}} = (X^T X)^{-1} X^T \hat{\Sigma} X (X^T X)^{-1}$$
+
 $$\hat{SE}(\hat{\beta}_j) = \sqrt{\hat{V}_{\text{White}, jj}}$$
 
 Where:
@@ -539,7 +540,7 @@ These methods don't directly modify the data, instead adapting the model fitting
 
 ## Summary
 
-OLS is a simple, yet powerful technique for estimating the parameters of a linear regression model, but it relies on several assumptions to be effective. Other than misspecifications of the model (e.g. non-linear relationships, or omitted variables), the main limitation is it's sensitivity to outliers. While it is widely used in practice due to its efficiency and ease of interpretation, it is important to check whether the assumptions hold in a given dataset to ensure valid and reliable results. More complex models may better fit the data in some cases (e.g. Random Forest or XGBoost), which can be combined with something like SHAP for interpretation. However, even then, you should be careful to understand the data and model if you're trying to make causal claims about the relationships between the features and the outcome. In these cases it's useful to use regression to generate hypotheses, but then use other methods to validate (e.g. randomised experiments).
+OLS is a simple, yet powerful technique for estimating the parameters of a linear regression model, but it relies on several assumptions to be effective. Other than misspecifications of the model (e.g. non-linear relationships, or omitted variables), the main limitation is it's sensitivity to outliers. While it is widely used in practice due to its efficiency and ease of interpretation, it is important to check whether the assumptions hold in a given dataset to ensure valid and reliable results. More complex models may better fit the data in some cases (e.g. Random Forest or XGBoost), which can be combined with something like SHAP for interpretation. However, even then, if you're working with observational data you should be cautious about making causal claims due to the potential for uncontrolled confounders. That said, it's still a very useful method for generating hypotheses, which you can then use other methods to validate (e.g. randomised experiments).
 
 ## References:
 - For a more detailed refresher on Linear Algebra, Strang's [MIT course](https://ocw.mit.edu/courses/mathematics/18-06sc-linear-algebra-fall-2011/ax-b-and-the-four-subspaces/) is very good. Note, there's no need to scale the features when using the normal equation.
