@@ -425,7 +425,7 @@ As we covered above, we're estimating these coefficients based on just one sampl
 
 #### 1. Individual coefficients (t-test)
 
-This also uses the t-distribution, so if the confidence interval contains 0, the result will be not-significant (assuming the same alpha is used etc). Let's work through the process:
+This uses the t-distribution, so if the confidence interval contains 0, the result will be not-significant (assuming the same alpha is used etc). Let's work through the process:
 
 Null hypothesis ($$H_0: \beta_j = 0$$): feature j has no effect on the outcome y.
 
@@ -507,7 +507,7 @@ For example, if you're trying to predict income based on education across differ
 
 GLS generalizes OLS to handle error structures with heteroscedasticity (non-constant variance) and autocorrelation (correlation between errors). It's similar to WLS in that it explicitly adjusts the model to account for the error structure. However, it takes the weights from the inverse of the full error covariance matrix allowing for any general error covariance structure, whereas WLS uses the inverse of the error variances for each observation so is specifically for heteroscedasticity (assumes errors are uncorrelated). This makes it more flexible, but more computationally complex.
 
-\hat{\beta}_{GLS} = \left(X^T \Sigma^{-1} X\right)^{-1} X^T \Sigma^{-1} Y
+$$\hat{\beta}_{GLS} = \left(X^T \Sigma^{-1} X\right)^{-1} X^T \Sigma^{-1} Y$$
 
 Where:
 
