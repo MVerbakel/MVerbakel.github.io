@@ -4,7 +4,7 @@ title: "Linear regression (theory review)"
 mathjax: true
 ---
 
-Linear regression is a model for predicting a continuous outcome (dependent variable), from a set of features (independent variable/s). For example, you could use it on past home sales data to predict the price of a new listing. The outcome would be the sale price, and the predictors could be things like the number of bedrooms, and size of the house. While the true relationships between these features and the outcome in the real world are likely complex, we can often get a reasonable approximation with a simple additive linear model. If you think of each row in the data set as an equation, we want to figure out what (linear) combination of the features we should take to get a value as close as possible to the actual sale prices. Given it's simplicity, efficiency and interpretability, it's one of the most commonly used models in practice. However, it can produce biased estimates and inaccurate statistical inference when the assumptions are not met, so it's important to properly review the model fit and interpret the results correctly. 
+Linear regression is a model for predicting a continuous outcome (dependent variable), from a set of features (independent variable/s). For example, you could use it on past home sales data to predict the price of a new listing. The outcome would be the sale price, and the predictors could be things like the number of bedrooms, and size of the house. While the true relationships between these features and the outcome in the real world are likely complex, we can often get a reasonable approximation with a simple additive linear model. If you think of each row in the data set as an equation, we want to figure out what (linear) combination of the features we should take to get a value as close as possible to the actual sale prices. Given it's simplicity, efficiency and interpretability, it's one of the most commonly used models in practice. It's used for both prediction (e.g. predicting home sale prices), and understanding relationships (e.g. what factors drive a higher sale price?). However, it can produce biased estimates and inaccurate statistical inference when the assumptions are not met, so it's important to properly review the model fit and interpret the results correctly. A warning, this is a very long post, mostly intended to be a reference for me when I want to refresh my memory.
 
 ## Intuition
 
@@ -155,7 +155,7 @@ Below are some examples of how the plots might look for well behaved (normal) re
 
 ## Iterating on the model
 
-Based on the above evaluation you'll likely identify some possible improvements or issues that need to be resolved in a new iteration of the model. Below I'll cover some of the topics that come up at this stage: outliers; standardising features; and, feature selection.
+Based on the above evaluation you'll likely identify some possible improvements or issues that need to be resolved in a new iteration of the model. Below I'll cover some of the topics that come up at this stage: outliers; standardising features; adding features; and, feature selection.
 
 ### Handling outliers
 
@@ -164,6 +164,12 @@ Outliers are typically identified during the residual diagnostics, but can be mo
 ### Standardised features
 
 If you want to compare the coefficients, then it's useful to put them all on the same scale by standardising the values before fitting the model (i.e. x - mean / std deviation). Then they can be ranked based on their absolute magnitude to understand which features have the largest effect on the outcome. Just keep in mind there's still the issue of whether the coefficients are unbiased, and you'll want to only consider those that are significant (covered later).
+
+### Adding more features
+
+Adding new features that are predictive of the outcome can improve the model's accuracy, but also the precision of the coefficient estimates (i.e. smaller confidence intervals). When the residual variance is reduced (reducing the unexplained variance), the standard errors of the coefficients are also reduced, leading to smaller confidence intervals. However, adding too many features that have a weak or no effect on the outcome leads to overfitting. If they're highly correlated (multicollinearity), it can also destabilise the coefficient estimates and increase their variance. An example of this is adding features that are predictive of another feature, but not the outcome. It can lead to multicollinearity, or reduce the variance of the feature (which is harmful).
+
+The other type of features you might add are variations of the existing, such as: polynomials (i.e. X^n to capture non-linearity); and, interactions (when the effect of one feature might depend on the value of a second feature). As with the above, adding too many can lead to overfitting. This is where the next section on feature selection is useful.
 
 ### Feature Selection
 
@@ -243,7 +249,7 @@ Partial Least Squares (PLS) is another dimensionality reduction technique. Like 
 
 ## Statistical inference
 
-When interpreting the coefficients, we typically have causal questions in mind (how does feature X affect Y), but in most cases we'll only find what features are associated with the outcome using linear regression. While it's possible to use linear regression to get causal estimates (e.g. with data from a randomised trial), if we're using observational data it's very difficult to know if we've controlled for all confounders. However, it's still a very useful technique for generating hypotheses that we can then try to validate with other methods.
+When interpreting the coefficients, we typically have causal questions in mind (e.g. how does feature X affect Y?). In many cases we'll only find what features are associated with the outcome. While it's possible to use linear regression to get causal estimates (e.g. with data from a randomised trial), if we're using observational data it's very difficult to know if we've controlled for all confounders. However, it's still a very useful technique for generating hypotheses that we can then try to validate with other methods. If your primary goal is prediction, then you may care less about the coefficients. However, it's generally still useful, and in some cases required, to explain the predictions.
 
 ### Coefficients
 
@@ -544,7 +550,7 @@ These methods don't directly modify the data, instead adapting the model fitting
 
 ## Summary
 
-OLS is a simple, yet powerful technique for estimating the parameters of a linear regression model, but it relies on several assumptions to be effective. Other than misspecifications of the model (e.g. non-linear relationships, or omitted variables), the main limitation is it's sensitivity to outliers. While it is widely used in practice due to its efficiency and ease of interpretation, it is important to check whether the assumptions hold in a given dataset to ensure valid and reliable results. More complex models may better fit the data in some cases (e.g. Random Forest or XGBoost), which can be combined with something like SHAP for interpretation. However, even then, if you're working with observational data you should be cautious about making causal claims due to the potential for uncontrolled confounders. That said, it's still a very useful method for generating hypotheses, which you can then use other methods to validate (e.g. randomised experiments).
+OLS is a simple, yet powerful technique for estimating the parameters of a linear regression model, but it relies on several assumptions. Other than misspecifications of the model (e.g. non-linear relationships, or omitted variables), the main limitation is it's sensitivity to outliers. While it is widely used in practice due to its efficiency and ease of interpretation, it is important to check whether the assumptions hold to ensure valid and reliable results. More complex models may better fit the data in some cases (e.g. Random Forest or XGBoost), which can be combined with something like SHAP for interpretation. However, even then, if you're working with observational data you should be cautious about making causal claims due to the potential for uncontrolled confounders. That said, it's still a very useful method for generating hypotheses, which you can then use other methods to validate (e.g. randomised experiments).
 
 ## References:
 - For a more detailed refresher on Linear Algebra, Strang's [MIT course](https://ocw.mit.edu/courses/mathematics/18-06sc-linear-algebra-fall-2011/ax-b-and-the-four-subspaces/) is very good. Note, there's no need to scale the features when using the normal equation.
