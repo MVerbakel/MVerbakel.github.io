@@ -263,7 +263,7 @@ Where:
 - $$\beta_1, \dots,\beta_n$$ are the slope coefficients for the features $$X_1, \dots,X_n$$: how much Y is expected the change for a one-unit change in $$X_n$$, holding all other features constant (for binary, it's the change from 0 to 1).
 - $$\epsilon_i$$ is the error (factors not in the model), estimated by the residual (actual-predicted value)
 
-Interpreting the estimated coefficients ($$\hat{\beta_n}$$) depends on the feature types, so let's work through some examples:
+In general, the coefficients represent the effect of a one unit change in the feature on the outcome. However, interpreting the estimated coefficients ($$\hat{\beta_n}$$) depends on the feature types, so let's work through some examples:
 
 #### Binary and continuous features
 $$Income_i = 30 + 5*Gender + 2*Experience$$
