@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Logistic Regression"
+title: "Logistic regression: theory review"
 mathjax: true
 ---
 

@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Linear regression (theory review)"
+title: "Linear regression: theory review"
 mathjax: true
 ---
 
