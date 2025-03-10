@@ -22,3 +22,4 @@ General questions: I have two samples, are they the same?
 
 Add the flow chart from here: https://docs.google.com/document/d/1q1GNRz2YCo21KvTWJKEhg2cmGUTFO427iXBucGgWOPQ/edit?tab=t.0
 
+Simpsons paradox
