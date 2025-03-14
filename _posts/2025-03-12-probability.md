@@ -55,7 +55,11 @@ Moments are used to describe the shape of the distribution. Each "moment" provid
 
 ## Expected Value
 
-The average value over the long run. We can find an expected value by multiplying each numerical outcome by the probability of that outcome, and then summing those products together. Consider a game where we have a $$4/10$$ chance of winning $2, a $$4/10$$ chance of losing $5, and a $$2/10$$ chance of winning $10. The EV is $$4/10 * 2 + 4/10 * -5 + 2/10 * 10 = 0.8-2+2=0.8$$. So on average, we expect to win 80 cents per game in the long run. In statistics, a similar concept is the population mean, which is often estimated from the sampling distribution—the probability distribution of outcomes obtained from many samples.
+The average value over the long run. We can find an expected value by multiplying each numerical outcome by the probability of that outcome, and then summing those products together. Consider a game where we have a $$4/10$$ chance of winning $2, a $$4/10$$ chance of losing $5, and a $$2/10$$ chance of winning $10. The EV is:
+
+$$4/10 * 2 + 4/10 * -5 + 2/10 * 10 = 0.8-2+2=0.8$$. 
+
+So on average, we expect to win 80 cents per game in the long run. In statistics, a similar concept is the population mean, which is often estimated from the sampling distribution—the probability distribution of outcomes obtained from many samples.
 
 ## Set notation
 
@@ -125,14 +129,14 @@ It can also be written as: posterior= likelihood*prior/evidence.
 
 **Example**: A box contains 8 fair coins (heads and tails) and 1 coin which has heads on both sides. I select a coin randomly and flip it 4 times, getting all heads. If I flip this coin again, what is the probability it will be heads?
 
-- Fair coin: P(H∣fair)=0.5
-- Biased coin: P(H∣not fair)=1
+- Fair coin: $$P(H \mid fair)=0.5$$
+- Biased coin: $$P(H \mid not fair)=1$$
 - Prior probability of selecting a fair coin: P(fair) = 8/9
-- Conditional probability of 4 H given it's a fair coin: P(4 heads | fair) = 0.5^4 = 0.0625
-- Conditional probability of 4 H given it's an unfair coin: P(4 heads | not fair) = 1
-- Total probability of 4 H: P (4 heads) = 8/9*0.0625 + 1/9*1
-- Now, use Bayes' Theorem to calculate the probability that the coin is fair, given that we observed 4 heads: P(fair | 4 heads) = P(4 heads | fair)*P(fair) / P(4 heads) = 0.0625 * 8/9 / 8/9*0.0625 + 1/9*1 = 1/3
-- Using this we can calculate the probability that the next flip will be heads: P(H) again = 1/3 * P(H|F) + 2/3 * P(H|not fair) = 1/3 * 1/2 + 2/3 * 1 = 5/6
+- Conditional probability of 4 H given it's a fair coin: $$P(4 heads \mid fair) = 0.5^4 = 0.0625$$
+- Conditional probability of 4 H given it's an unfair coin: $$P(4 heads \mid not fair) = 1$$
+- Total probability of 4 H: P(4 heads) = 8/9*0.0625 + 1/9*1
+- Now, use Bayes' Theorem to calculate the probability that the coin is fair, given that we observed 4 heads: $$P(fair \mid 4 heads) = P(4 heads \mid fair)*P(fair) / P(4 heads) = 0.0625 * 8/9 / 8/9*0.0625 + 1/9*1 = 1/3$$
+- Using this we can calculate the probability that the next flip will be heads: $$P(H) again = 1/3 * P(H \mid F) + 2/3 * P(H \mid not fair) = 1/3 * 1/2 + 2/3 * 1 = 5/6$$
 
 ## Simpson's paradox
 
