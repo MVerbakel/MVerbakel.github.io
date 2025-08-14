@@ -121,8 +121,8 @@ In general, the t-test or Welch's t-test is most common for comparing means, and
 
 The effect of an experiment is not always uniform (i.e. there are heterogeneous treatments effects), so it can be useful to break down the results for different segments. For example, market or country (e.g. could be different reactions by region, or localisation issues), device or platform (e.g. web/mobile/app, iOS/Android, and browser breakdowns can help with spotting bugs), time of day and day of week (plotting effects over time), user characteristics (did they join recently e.g. within last month, account type (single/shared, business/personal)). Some considerations:
 - Think about whether the sub-segments are comparable, as sometimes the differences may not be due to the treatment (e.g. the click through rate can differ for different operating systems because of different tracking technologies);
-- Use the pre-treatment values as users might change segment due to the treatment;
-- Avoid comparing segments that are not on the same unit as the randomisation (e.g. cancellation rate of bookers when you randomised visitors). These groups are not comparable anymore.
+- Use the pre-treatment values as users might change segment due to the treatment (this is particularly common if the variable is based on a model);
+- Avoid comparing segments that are not on the same unit as the randomisation (e.g. cancellation rate of bookers when you randomised visitors). These groups are not comparable anymore because you've shifted some users from "non-bookers" to "bookers" in the treatment group, but the comparable users in the control (the non-bookers who would be bookers with treatment) are being excluded.
 - Correct for multiple testing. Alternatievly, one way to deal with this is to do many breakdowns (which could also be done with ML, e.g. a decision tree), identify and explore those that are interesting, and then validate them in a new experiment or with other methods on new data.
 - Simpson's paradox (different directions of association between small groups and the overall totals): This happens when we compare a treatment across two groups, and the proportions are not equal (e.g. doctor A treats more hard cases than doctor B, so even though doctor A has a higher success rate for both hard and easy cases, when the data is aggregated doctor B appears more successful). We can see this in experiments when the sampling ratio is different for different segments, or when ramping is used. For example, if we start with 1% in variant, then the next day increase to 50% in variant, even if the CR is higher in variant on both days, the table below shows how we end up with an overall negative effect (as day 1 counts more towards the control total). The problem is a higher proportion of the treatment observations are in day 2, and the conversion rate was in general lower on day 2.
 
@@ -154,7 +154,7 @@ Measuring long term effects is always a challenge given we typically want to lau
 
 ### Opt-in products
 
-Delayed Activation (e.g. opt-in products): Usually you would randomise assignments for some recruitment period, and then continue to observe for some observation window to give time for people to activate. Otherwise you might underestimate the effect size as newer users haven't had time to activate.
+Delayed Activation (e.g. opt-in products): Usually you would randomise assignments for some recruitment period, and then continue to observe for some observation window to give time for people to activate. Otherwise you might underestimate the effect size as newer users haven't had time to activate. In addition to overall metrics, it's useful to check the results based on days since activation to see if there's any.
 
 ### Experiments with an expected impact on performance
 

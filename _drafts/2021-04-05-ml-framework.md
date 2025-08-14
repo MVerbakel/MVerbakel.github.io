@@ -11,6 +11,7 @@ High cardinality
 Feature exploration - is there any potential?
 Model development
 Model validation - measuring performance, pros and cons of different metrics for optimisation
+Sensitivity vs specificity
 Optimisation
 Model deployment
 
@@ -20,3 +21,8 @@ Broad categories of models, explanation, pros and cons.
 - naive bayes
 - tree based
 - regression
+
+
+SVM
+Decision trees
+XGBoost

@@ -1,0 +1,1 @@
+Work through some examples, using different models etc and evaluation. Practical guide, with Python code. Don't go into theory, just link posts.

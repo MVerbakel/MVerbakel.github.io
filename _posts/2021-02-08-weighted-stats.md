@@ -161,7 +161,7 @@ print('t-statistic = {:.3f}, p-value = {:.3f}'.format(t_value, p_val))
 t-statistic = 0.653, p-value = 0.522
 ```
 
-#### Alternative
+#### Using statsmodels
 
 Alternatively, there are a number of statistical packages that can handle weights. E.g. the above is almost identical to the approach used in the package statsmodels.stats.weightstats:
 
@@ -181,6 +181,16 @@ print('t-statistic = {:.3f}, p-value = {:.3f}'.format(tstat, pval))
 t-statistic = 0.620, p-value = 0.543
 ```
 
+### Weighted regression (WLS)
+
+Another common scenario for using weighted values is when fitting a regression model to grouped data, where each observation represents a group, and there's a column indicating the size of each group. In such cases, we can assign weights to the model based on the group size, ensuring that larger groups have more influence on the regression than smaller ones. This approach is analogous to assigning equal weight to each individual observation. In statsmodels, performing a weighted least squares (WLS) regression is straightforward:
+
+```python
+import statsmodels.formula.api.wls as wls
+
+weighted_model = wls.('y ~ x', data=df, weights=df["count"]).fit()
+print(weighted_model.summary().tables[1])
+```
 
 References: [Wikipedia](https://en.wikipedia.org/wiki/Weighted_arithmetic_mean#Weighted_sample_variance), [statsmodels](https://www.statsmodels.org/stable/_modules/statsmodels/stats/weightstats.html)
 

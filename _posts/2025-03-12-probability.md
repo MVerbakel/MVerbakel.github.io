@@ -34,14 +34,13 @@ When plotted, it typically produces a curve that starts high and quickly tapers 
 
 The distributions shown above are either a PMF or PDF depending on the outcome type:
 
+<img src="/assets/pmf_pdf_cdf.png" alt="PMF vs PDF" width="100%"/>
+
 | **Metric**                                | **Formula**                                                                                                         | **Description**                                                                                                               |
 |-------------------------------------------|---------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|
 | **Probability Mass Function (PMF)**       | $$P(X = x)$$                                                                                                       | Describes the probability distribution of a discrete random variable. The PMF gives the probability that a discrete random variable is exactly equal to some value. For example, in a coin toss, the probability of heads or tails. |
 | **Probability Density Function (PDF)**    | $$f(x) = \frac{d}{dx} P(X \leq x)$$                                                                                 | Describes the probability distribution of a continuous random variable. The PDF defines the probability of the random variable falling within a particular range of values, and its integral over an interval gives the probability. The total area under the curve equals 1. |
 | **Cumulative Distribution Function (CDF)**| $$F(x) = P(X \leq x) = \int_{-\infty}^{x} f(t) dt$$                                                                  | Gives the probability that a random variable is less than or equal to a certain value. For a discrete variable, it’s the sum of the probabilities of all outcomes less than or equal to \(x\). For a continuous variable, it’s the area under the PDF curve up to \(x\). |
-
-What they might look like:
-<img src="/assets/pmf_pdf_cdf.png" alt="PMF vs PDF" width="100%"/>
 
 ## Moments
 

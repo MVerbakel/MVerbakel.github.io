@@ -173,7 +173,7 @@ The other type of features you might add are variations of the existing, such as
 
 ### Feature Selection
 
-If multicollinearity is an issue, a common solution is to reduce the feature set. However, in general a simpler model with fewer features is more desirable in terms of efficiency, interpretability, and performance (reducing risk of overfitting). It can be done in a few ways: stepwise selection (forward/backward/bi-directional); regularisation of the coefficients (lasso/ridge/elastic net); Principal Components Analysis (PCA); or, Partial Least Squares. Each has pros and cons, so it will depend on your problem and goals.
+If multicollinearity is an issue, a common solution is to reduce the feature set. However, in general a simpler model with fewer features is more desirable in terms of efficiency, interpretability, and performance (reducing risk of overfitting). It can be done in a few ways: stepwise selection (forward/backward/bi-directional); regularisation of the coefficients (lasso/ridge/elastic net); Principal Components Analysis (PCA); or, Partial Least Squares. Each has pros and cons, so it will depend on your problem and goals. However, a caution: automated feature selection is usually not recommended for causal inference, because a feature’s predictive power does not reliably indicate whether it is a confounder that must be adjusted for. It may still be useful as an exploratory tool to understand correlated features, but final feature selection should be guided by domain knowledge and the causal structure of the problem.
 
 ### 1. Stepwise selection
 
@@ -260,17 +260,17 @@ $$Y_i = \beta_0 + \beta_1 X_{1i} + \beta_2 X_{2i} + \dots + \beta_k X_{ki} + \ep
 Where:
 - $$Y_i$$ is the outcome for observation i
 - $$\beta_0$$ is the intercept: a constant for Y when all X = 0
-- $$\beta_1, \dots,\beta_n$$ are the slope coefficients for the features $$X_1, \dots,X_n$$: how much Y is expected the change for a one-unit change in $$X_n$$, holding all other features constant (for binary, it's the change from 0 to 1).
+- $$\beta_1, \dots,\beta_k$$ are the slope coefficients for the features $$X_1, \dots,X_k$$: how much Y is expected the change for a one-unit change in $$X_k$$, holding all other features constant (for binary, it's the change from 0 to 1).
 - $$\epsilon_i$$ is the error (factors not in the model), estimated by the residual (actual-predicted value)
 
-In general, the coefficients represent the effect of a one unit change in the feature on the outcome. However, interpreting the estimated coefficients ($$\hat{\beta_n}$$) depends on the feature types, so let's work through some examples:
+In general, the coefficients represent the effect of a one unit change in the feature on the outcome. However, interpreting the estimated coefficients ($$\hat{\beta_k}$$) depends on the feature types, so let's work through some examples:
 
 #### Binary and continuous features
 $$Income_i = 30 + 5*Gender + 2*Experience$$
 - Gender is coded 1=Male and 0=Female, all values in '000's
 - The intercept tells us that income is 30K on average when Gender=Female and Experience=0 (may be rare or non-existent).
 - $$\hat{\beta}_1$$=5K tells us being male is associated with +5K in income (vs females), holding experience constant.
-- $$\hat{\beta}_2$$=1K tells us every +1 year in experience is associated with +2K in income, holding gender constant.
+- $$\hat{\beta}_2$$=2K tells us every +1 year in experience is associated with +2K in income, holding gender constant.
 - The predicted income for a female with 10 years experience is 30K + 5(0) + 2(10) = 50K, and for a male it would be 30K + 5(1) + 2(10) = 55K.
 
 #### Interaction term
@@ -278,7 +278,7 @@ $$Income_i = 30 + 5*Gender + 2*Experience + 500(Gender*Experience)$$
 - The intercept is unchanged.
 - $$\hat{\beta}_1$$=5K tells us the difference in female and male income for individuals with 0 years experience (males earn 5K more).
 - $$\hat{\beta}_2$$=2K tells us each year of experience is expected to add +2K when gender=0 (i.e. for females).
-- $$\hat{\beta}_3$$=500 is the difference in the effect of experience on income by gender (combined effect): for males we expect an extra +500 increase in income for every year of experience (on top of the 2K from $$\hat{\beta}_2$$).
+- $$\hat{\beta}_3$$=500 modifies the effect of experience for males: for males, each additional year of experience adds an extra +500 in income (on top of the 2K from $$\hat{\beta}_2$$).
 - The predicted income for a female with 10 years experience would be: 30K + 5(0) + 2(10) + 500(0x10) = 50K.
 - The predicted income for a male with 10 years experience would be: 30K + 5(1) + 2(10) + 500(1x10) = 60K.
 - The difference boils down to $$\beta_1$$ + $$experience * \beta_3$$
@@ -288,11 +288,57 @@ $$Income_i = 30 + 5*Gender + 1*Age + -0.01*Age^2$$
 - The intercept is unchanged.
 - $$\hat{\beta}_1$$=5K tells us the difference in female and male income, holding age constant (males expected to have +5K).
 - $$\hat{\beta}_2$$=1K tells us we expect +1K income for every additional year of age at the younger ages (before taking into account the quadratic effect), holding gender constant. 
-- $$\hat{\beta}_2$$=-10 tells us the rate at which income increases, decreases with age and eventually reverses (concave).
+- $$\hat{\beta}_3$$=-0.01K=-10 tells us the rate at which income increases, decreases with age and eventually reverses (concave).
 - The predicted income for a 30 year old male would be: 30 + 5(1) + 1(30) - 0.01(30^2) = 65 - 9 = 56K
 - The predicted income for a 75 year old male would be: 30 + 5(1) + 1(75) - 0.01(75^2) = 110 - 56 = 54K
 
 Adding higher order polynomials is the same, but capturing the higher order effects. E.g. Adding $$age^3$$ to the above would capture the cubic effect of age on income, while the $$age^2$$ still captures the quadratic effects, and age captures the linear. 
+
+#### Dummy variables
+
+Let's explore regression with dummy variables a little further. In a regression of an outcome on a dummy variable, the OLS estimator minimises the total squared error by choosing the group means as the best predictions. Suppose we model Income based on Gender, where Male = 1 and Female = 0:
+
+$$
+Y_i = \beta_0 + \beta_1 \times \text{Gender}_i
+$$
+
+The intercept $$\beta_0$$ is the mean of the baseline group (females), and the slope $$\beta_1$$ is the difference in means between the two groups, which is the increment added to the intercept for males ($$\bar{x}_\text{males}-\bar{x}_\text{females}$$):
+
+$$
+\beta_1 = \mathbb{E}[Y_i \mid \text{Gender}_i = 1] - \mathbb{E}[Y_i \mid \text{Gender}_i = 0]
+$$
+
+This happens because, mathematically, the value that minimises squared deviations from a set of numbers is their average, so the regression naturally aligns with the group means. If you were to minimise the absolute deviation, then it would be the median. Adding additional variables turns this into a conditional difference in means. For example:
+
+$$
+Y_i = \beta_0 + \beta_1 \times \text{Gender}_i + \beta_2 \times \text{Experience}_i
+$$
+
+At every level of Experience, the predicted incomes for males and females are parallel lines. Gender shifts the intercept by a constant amount. This reflects the assumption that Gender and Experience affect Income independently. If we include an interaction term, the effect of Gender can vary with Experience:
+
+$$
+Y_i = \beta_0 + \beta_1 \times \text{Gender}_i + \beta_2 \times \text{Experience}_i + \beta_3 \times (\text{Gender}_i \times \text{Experience}_i)
+$$
+
+With this, the predicted lines are no longer parallel, illustrating how Gender’s effect changes depending on Experience.
+
+<img src="/assets/dummy_regression.png" alt="Regression with dummies" width="100%"/>
+
+#### Categorical variables
+
+Building on the previous discussion, we can fit a regression model where a categorical predictor with n categories is represented by k = n - 1 binary (dummy) variables. This approach estimates the average outcome for each category relative to a baseline group, rather than imposing a fixed functional form.For example, instead of assuming each additional year of experience adds a constant amount to income, we treat experience as a categorical variable with one dummy variable per year of experience (except the baseline):
+
+$$
+\text{Income}_i = \beta_0 + \sum_{k=1}^{n-1} \beta_k \cdot D_{ik} + \varepsilon_i
+$$
+
+Where $$D_{ik}$$ equals 1 if individual i belongs to experience category k, and 0 otherwise.
+
+This model is fully saturated with respect to the categorical predictor, because it includes a distinct parameter for each category (except the baseline). It perfectly fits the training data by estimating the mean outcome for each category, minimizing residuals within groups and resulting in a residual sum of squares as low as possible given the data.
+
+In this sense, the model is non-parametric: it does not assume any particular shape or linear relationship between experience and income. Instead, it allows the effect of experience on income to vary freely across categories, producing a stepwise function rather than a continuous slope.
+
+The main advantage of doing this is flexibility: this model lets the data determine how income changes with experience without imposing linearity. However, this flexibility comes at a cost: higher variance in estimates, especially for categories with fewer observations, which can reduce precision and lead to overfitting.
 
 ### Standard errors
 
