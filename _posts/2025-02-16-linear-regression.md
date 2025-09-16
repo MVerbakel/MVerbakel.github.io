@@ -73,34 +73,94 @@ Conditions to compute:
 - No missing data: pre-processing needed so that $$A^TA$$ can be computed.
 - No severe scaling issues: scaling is not strictly necessary (doesn't directly impact the solution), but it can improve computational efficiency and numerical stability in some cases. When there's large differences, there can be errors and a longer compute time for the inverse $$(A^TA)^\text{-1}$$. Outliers can also bias the $$\beta$$ coefficients, and should be handled in pre-processing.
 
-### Gradient Descent
+### Iterative Optimisation
 
-When you're working with large data sets and many features, the normal equation approach becomes computationally infeasible. Optimisation algorithms such as Gradient Descent find an approximate solution to OLS by iteratively adjusting the model parameters ($$\beta$$, including the intercept) to minimise the Mean Squared Error (MSE). We use MSE instead of the sum (RSS), as averaging the error (scaling by 1/m) reduces the magnitude of the gradient, making the computations easier and convergence smoother.
+For large data sets or when using regularisation, the normal equation approach can become infeasible. In these cases, we can approximate the solution by iteratively adjusting the model parameters to minimise the mean squared error (MSE). Using the average rather than the sum of squared errors scales the gradient, making convergence smoother.
 
-The basic idea is to start with some values for the unknown model parameters ($$\beta$$ coefficients), either small random numbers or 0, and gradually change them depending on whether the outcome was over or under predicted (using the derivative of the function to determine the direction of the slope). With multiple features, we compute the gradient of the cost function with respect to each $$\beta$$, but then the update rule is applied simultaneously. Meaning we optimise all of them at once in each step. The process is repeated for a fixed number of steps or until the convergence criteria is met (change in the cost function is smaller than a cutoff).
+The basic idea is to start with initial values for the coefficients ($\beta$), usually zeros or small random numbers, and gradually adjust them depending on the prediction error. With multiple features, we compute the gradient of the cost function with respect to each $\beta$ and update all coefficients simultaneously in each iteration. The process is repeated until convergence criteria are met, such as when the change in the cost function is smaller than a cutoff.
 
-**Cost function**:
-$$J(\beta) = \frac{1}{m} \sum_{i=1}^{m} (y_i - \hat{y}_i)^2$$ or equivelantly $$J(\beta) = \frac{1}{m} (y - X \beta)^T (y - X \beta)$$
+1. Initialise the coefficient vector $\theta$ with zeros or small random values.
+2. Compute predicted outcomes for each observation:
+   $\hat{y}_i = x_i \cdot \theta$
+3. Compute the mean squared error:
+   $J(\theta) = \frac{1}{m} \sum_{i=1}^{m} (y_i - \hat{y}_i)^2$
+4. Compute the gradient with respect to each coefficient:
+   $\nabla_\theta J(\theta) = -\frac{2}{m} \sum_{i=1}^{m} (y_i - x_i \cdot \theta) x_i$
+5. Update the coefficients according to the chosen optimisation method and repeat until convergence.
 
-**Update rule**:
-$$\beta := \beta + \frac{2\alpha}{m} X^T (y - X\beta)$$
+#### First-order methods
 
-We can set the size of each step with the learning rate ($$\alpha$$): too small a step will take a long time, while too large a step can cause it to fail to converge (keep overshooting). This is demonstrated in the image below using just one feature ($$\theta_1$$) and the intercept ($$\theta_0$$). Each star represents a step (the distance determined by $$\alpha$$), and the arrows point to the minimum. The direction in which the step is taken is determined by the partial derivative of J(0,1). Depending on where one starts on the graph, one could end up at different points.
+First-order methods use the gradient of the cost function to iteratively update the coefficients. For linear regression, the gradient points in the direction of steepest ascent, so we move in the opposite direction to minimise the MSE:
 
-<img src="/assets/gradient_descent.png" alt="gradient descent" width="70%"/> 
-Source: [Supervised Machine Learning: Regression and Classification](https://www.coursera.org/learn/machine-learning)
+* Positive gradient: predicted value less than actual, increase $\theta_j$
+* Negative gradient: predicted value greater than actual, decrease $\theta_j$
+* Large gradient: large prediction error, take a larger step
+* Small gradient: small prediction error, take a smaller step
 
-As the squared error in OLS is quadratic (convex), there is only one global minimum. This means Gradient Descent will always converge when applied to OLS, and should produce the same solution as the normal equation. In practice, there may be differences depending on the stopping criteria and learning rate.
+Gradient descent and its variants (stochastic gradient descent, stochastic average gradient) update all coefficients simultaneously in each step.
 
-<img src="/assets/learning_rates_gd.png" alt="alpha impact" width="60%"/> 
-Source: [Supervised Machine Learning: Regression and Classification](https://www.coursera.org/learn/machine-learning)
+**Gradient Descent**  
 
-Conditions to compute:
-- No missing data: pre-processing required so the cost function can be computed.
-- Scale or standardize features to prevent large values from dominating the gradient updates and improve convergence speed (descends quicker on small ranges).
-- Handle outliers: Similar to the above, can cause unstable convergence (large gradients). A smaller learning rate can help (but slower).
-- Linearly independent features (no multicollinearity): while it doesn't require matrix inversion like the normal equation, highly correlated features can still cause unstable updates and slow convergence so should be avoided.
-- Initialize parameters to small random values or zeros. Random initialization is often preferred for better convergence.
+The parameters are updated iteratively in the direction of the negative gradient of the cost function. For linear regression with mean squared error, the update rule is:
+
+$$
+\theta := \theta - \alpha \nabla_\theta J(\theta)
+$$
+
+The gradient of the MSE is:
+
+$$
+\nabla_\theta J(\theta) = -\frac{2}{m} X^T (y - X\theta)
+$$
+
+Substituting the gradient gives the explicit update:
+
+$$
+\theta := \theta + \frac{2\alpha}{m} X^T (y - X\theta)
+$$
+
+Where:  
+* $\theta$ is the vector of model parameters at the current iteration  
+* $\alpha$ is the learning rate, controlling the step size. Too small slows convergence, while too large can overshoot the minimum  
+
+The gradient points in the direction of steepest increase in the cost function. Moving in the opposite direction reduces the mean squared error.  
+
+The effect of the learning rate is illustrated in the image below, using one feature ($\theta_1$) and the intercept ($\theta_0$). Each star represents a step, and the arrows indicate the direction toward the minimum. The path depends on the starting point and the learning rate, but for convex quadratic cost functions, the final solution is always the same.  
+
+<img src="/assets/gradient_descent.png" alt="gradient descent" width="70%"/>  
+Source: [Supervised Machine Learning: Regression and Classification](https://www.coursera.org/learn/machine-learning)  
+
+Because the squared error in OLS is quadratic, there is only one global minimum. Gradient Descent will always converge to this solution, although the exact path depends on the learning rate and stopping criteria.  
+
+<img src="/assets/learning_rates_gd.png" alt="alpha impact" width="60%"/>  
+Source: [Supervised Machine Learning: Regression and Classification](https://www.coursera.org/learn/machine-learning)  
+
+**Stochastic Gradient Descent (SGD)**
+
+Instead of computing the gradient over the entire dataset, SGD updates the coefficients using one random sample at a time. This reduces memory usage and speeds up per-iteration updates, but can cause noisy updates that oscillate around the minimum.
+
+**Stochastic Average Gradient (SAGA)**
+
+SAGA improves on SGD by storing an average of past gradients to reduce variance, leading to faster convergence. It is particularly efficient for sparse data or L1-regularised problems.
+
+**Coordinate Descent**
+
+Coordinate descent updates one coefficient at a time while holding the others fixed. This method is the default for Lasso and ElasticNet in Python’s `scikit-learn` and can handle large, sparse datasets efficiently:
+
+$\theta_j := \theta_j - \alpha \frac{\partial J(\theta)}{\partial \theta_j}$
+
+#### Regularisation
+
+When using Ridge (L2), Lasso (L1), or ElasticNet penalties, the cost function becomes:
+
+* Ridge:
+  $J(\theta) = \frac{1}{m} \sum_{i=1}^{m} (y_i - x_i \cdot \theta)^2 + \lambda \sum_{j=1}^{n} \theta_j^2$
+* Lasso:
+  $J(\theta) = \frac{1}{m} \sum_{i=1}^{m} (y_i - x_i \cdot \theta)^2 + \lambda \sum_{j=1}^{n} |\theta_j|$
+* ElasticNet:
+  $J(\theta) = \frac{1}{m} \sum_{i=1}^{m} (y_i - x_i \cdot \theta)^2 + \lambda_1 \sum_{j=1}^{n} |\theta_j| + \lambda_2 \sum_{j=1}^{n} \theta_j^2$
+
+Gradient descent can be used for Ridge regression, while coordinate descent is preferred for Lasso and ElasticNet, which is the default in Python’s `scikit-learn`. These methods iteratively update coefficients until convergence, automatically handling the regularisation penalties during each step.
 
 ## OLS Assumptions
 

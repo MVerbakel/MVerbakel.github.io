@@ -4,15 +4,16 @@ title: "Probability refresher"
 mathjax: true
 ---
 
-The goal of probability theory is to quantify uncertainty. Once an event occurs, the outcome is known (e.g. it rained today or it didn’t). However, before an event happens, probability allows us to assess the likelihood of various potential outcomes (e.g. the chance that it will rain). Depending on the relationship between events, probability rules help us calculate the likelihood of a given outcome in a straightforward manner. A fundamental concept in probability is that of random variables, which assign numerical values to the outcomes of random processes. These random variables can take different forms: discrete, where the outcomes are countable (such as the number of heads in a series of coin flips), or continuous, where the outcomes can take any value within a given range (such as the height of a person). Understanding and applying probability theory equips us to make informed decisions based on the inherent uncertainty in real-world phenomena.
+The goal of probability theory is to quantify uncertainty. Once an event occurs, the outcome is known (e.g. it rained today or it didn’t). However, before an event happens, probability allows us to assess the likelihood of various potential outcomes (e.g. the chance that it will rain). Depending on the relationship between events, probability rules help us calculate the likelihood of a given outcome in a straightforward manner. A fundamental concept in probability is that of random variables, which assign numerical values to the outcomes of random processes. These random variables can take different forms: discrete, where the outcomes are countable (such as the number of heads in a series of coin flips), or continuous, where the outcomes can take any value within a given range (such as the height of a person). Understanding and applying probability theory equips us to make informed decisions based on the inherent uncertainty in real-world phenomena. Below I'll summarise some of the key concepts that are relevant for Data Scientists.
 
+---
 ## Random Variables
 
 A random variable (also called a stochastic variable) is a function that assigns numerical values to the outcomes of a random event. These outcomes are drawn from a sample space, which is the set of all possible results. For instance, when flipping a fair coin, there are two equally likely outcomes: heads or tails. If we define a random variable X that assigns 1 to heads and 0 to tails, the probabilities for each are: P(H)=P(T)=½, which add to 1. Random variables can be:
 
-- Discrete: Taking values from a finite or countable set, such as the number of heads in a series of coin flips. The probability distribution for discrete random variables is described by a probability mass function (PMF).
-- Continuous: Taking values from an uncountable range, such as the height of a person, which can vary continuously. For continuous variables, the probability distribution is described by a probability density function (PDF).
-- Mixture of both: Sometimes random variables have a combination of discrete and continuous components.
+- **Discrete**: Taking values from a finite or countable set, such as the number of heads in a series of coin flips. The probability distribution for discrete random variables is described by a probability mass function (PMF).
+- **Continuous**: Taking values from an uncountable range, such as the height of a person, which can vary continuously. For continuous variables, the probability distribution is described by a probability density function (PDF).
+- **Mixture**: Sometimes random variables have a combination of discrete and continuous components (e.g. blood results where below a threshold it's "undetectable" (0 has some probability), but above that it's a continuous value, meaning no specific value has a positive probability).
 
 In statistics, random variables are usually considered to take real number values, which allows us to define important quantities like the expected value (mean), and variance. 
 
@@ -30,9 +31,11 @@ When plotted, it typically produces a curve that starts high and quickly tapers 
 
 <img src="/assets/power_law_examples.png" alt="power law" width="100%"/>
 
+The few extreme events can dominate the mean and even the variance. These aren’t outliers but expected features of a power law distribution (e.g. the largest customer, city, or influencer will be orders of magnitude larger than the average). In practice, examine distributions on a log-log scale to identify them, report medians or percentiles rather than means, and stress-test systems against extreme cases. Useful methods include nonparametric tests such as the Mann-Whitney U for testing, bootstrapped confidence intervals and quantile regression for estimation, and tail-aware models like Pareto or log-normal fits, robust regression, or simulations focused on top contributors for modelling.
+
 ## PMF / PDF / CDF
 
-The distributions shown above are either a PMF or PDF depending on the outcome type:
+The distributions shown above can be categorised as either a Probability Mass Function (PMF) or Probability Density Function (PDF) depending on the outcome type:
 
 <img src="/assets/pmf_pdf_cdf.png" alt="PMF vs PDF" width="100%"/>
 
@@ -54,12 +57,68 @@ Moments are used to describe the shape of the distribution. Each "moment" provid
 
 ## Expected Value
 
-The average value over the long run. We can find an expected value by multiplying each numerical outcome by the probability of that outcome, and then summing those products together. Consider a game where we have a $$4/10$$ chance of winning $2, a $$4/10$$ chance of losing $5, and a $$2/10$$ chance of winning $10. The EV is:
+The expected value represents the average outcome over the long run. We calculate it by multiplying each numerical outcome by its probability and summing these products. Consider a game where there is a 4/10 chance of winning \$2, a 4/10 chance of losing \$5, and a 2/10 chance of winning \$10. The expected value is:
 
-$$4/10 * 2 + 4/10 * -5 + 2/10 * 10 = 0.8-2+2=0.8$$. 
+$$
+\frac{4}{10} \cdot 2 + \frac{4}{10} \cdot (-5) + \frac{2}{10} \cdot 10 = 0.8 - 2 + 2 = 0.8
+$$
 
-So on average, we expect to win 80 cents per game in the long run. In statistics, a similar concept is the population mean, which is often estimated from the sampling distribution—the probability distribution of outcomes obtained from many samples.
+On average, we expect to win 80 cents per game in the long run. In statistics, this concept is analogous to the population mean, which is often estimated from the sampling distribution, the probability distribution of outcomes obtained from many samples.
 
+### Linearity of Expectation
+
+The expected value has a useful property called linearity, which holds even if variables are dependent. The expected value of a sum equals the sum of the expected values:
+
+$$
+E[X + Y] = E[X] + E[Y]
+$$
+
+This property extends to any finite sum of random variables:
+
+$$
+E\Big[\sum_{i=1}^n X_i\Big] = \sum_{i=1}^n E[X_i]
+$$
+
+Linearity of expectation makes it easy to compute averages and total outcomes in complex systems without needing to know the dependence structure between variables.
+
+**Example**: Suppose we roll two dice, $X_1$ and $X_2$, and want the expected sum. Each die has an expected value of 3.5. Even if the dice were somehow dependent, the expected sum is still:
+
+$$
+E[X_1 + X_2] = E[X_1] + E[X_2] = 3.5 + 3.5 = 7
+$$
+
+## Variance
+
+Variance measures how much the outcomes of a random variable spread around the expected value. For a discrete random variable X with outcomes $x_i$ and probabilities $p_i$, the variance is defined as:
+
+$$
+\text{Var}(X) = E[(X - E[X])^2] = \sum_i p_i (x_i - E[X])^2
+$$
+
+In the earlier game example, variance tells us how much each game’s outcome deviates from the expected value of 0.8. Higher variance indicates more spread in the outcomes, corresponding to greater risk or uncertainty.
+
+### Variance Decomposition
+
+Unlike the expected value, variability depends on how values deviate from their mean, so it is not generally additive across dependent variables. Meaning we can't simply sum the variances of two variables unless they are independent. Instead, we can break down the variability of $X$ with respect to another variable $Y$ using the law of total variance:
+
+$$
+\text{Var}(X) = E[\text{Var}(X \mid Y)] + \text{Var}(E[X \mid Y])
+$$
+
+Here, $E[\text{Var}(X \mid Y)]$ represents the average variability within groups defined by Y, and $\text{Var}(E[X \mid Y])$ represents the variability of the group means themselves.
+
+**Example**: Consider test scores for two classes.
+- **Class A**: 3 students scored 70, 75, 80 → mean = 75, variance = 25
+- **Class B**: 3 students scored 80, 85, 90 → mean = 85, variance = 25
+
+If we combine all 6 students:
+- **Within-class variance** (average of the class variances) = (25 + 25)/2 = 25
+- **Between-class variance** (variance of the class means 75 and 85) = 50
+- **Total variance** = within-class + between-class = 25 + 50 = 75
+
+The total variability comes both from differences within each class and differences between class averages, showing why variance requires careful treatment compared with expectation.
+
+---
 ## Set notation
 
 A set is simply a collection of distinct elements. In probability, we often deal with sets to define events and sample spaces. The sample space (denoted as S) is the set of all possible outcomes (e.g. S={H, T}). An event is any subset of the sample space (e.g. the event that the coin lands on heads can be represented as A={H}). When describing relationships between events, we use set notation:
@@ -99,7 +158,7 @@ Divide joint probability of A and B, by the marginal probability of B.
 
 ## Odds
 
-**Odds** are a different way of expressing the likelihood of an event. While probability is the ratio of favorable outcomes to total outcomes, odds are typically expressed as the ratio of favorable outcomes to unfavorable outcomes. For example, if you have a 1 in 5 chance of winning, the odds are 1:5. Odds magnify probabilities, so they allow us to compare probabilities more easily by focusing on large whole numbers. E.g. comparing 0.01 to 0.005 it's hard to see one is twice as large, but comparing 99 to 1 versus 199 to 1 makes it easier to see the relative difference.
+**Odds** are a different way of expressing the likelihood of an event. While probability is the ratio of favorable outcomes to total outcomes, odds are typically expressed as the ratio of favorable outcomes to unfavorable outcomes. For example, if you have a 1 in 5 chance of winning, the odds are 1:5. Odds magnify probabilities, so they allow us to compare probabilities more easily by focusing on large whole numbers. For example, comparing probabilities 0.01 and 0.005 is difficult to interpret directly, but the odds 99:1 vs 199:1 make it easier to see that one is roughly twice as likely as the other.
 
 ## Combinations and permutations
 
@@ -112,6 +171,7 @@ $$\binom{n}{k} = \frac{n!}{k!(n-k)!}$$
 
 $$P(n, k) = \frac{n!}{(n-k)!}$$
 
+---
 ## Bayes' Theorem
 
 Bayes' Theorem is the consequence of rearranging the conditional probability formula:
@@ -124,7 +184,7 @@ Where:
 - P(A) is the prior probability (our initial belief),
 - P(B) is the marginal likelihood (the total probability of the evidence).
 
-It can also be written as: posterior= likelihood*prior/evidence.
+It can also be written as: posterior = likelihood * prior / evidence. 
 
 **Example**: A box contains 8 fair coins (heads and tails) and 1 coin which has heads on both sides. I select a coin randomly and flip it 4 times, getting all heads. If I flip this coin again, what is the probability it will be heads?
 
@@ -136,6 +196,8 @@ It can also be written as: posterior= likelihood*prior/evidence.
 - Total probability of 4 H: P(4 heads) = 8/9*0.0625 + 1/9*1
 - Now, use Bayes' Theorem to calculate the probability that the coin is fair, given that we observed 4 heads: $$P(fair \mid 4 heads) = P(4 heads \mid fair)*P(fair) / P(4 heads) = 0.0625 * 8/9 / 8/9*0.0625 + 1/9*1 = 1/3$$
 - Using this we can calculate the probability that the next flip will be heads: $$P(H) again = 1/3 * P(H \mid F) + 2/3 * P(H \mid not fair) = 1/3 * 1/2 + 2/3 * 1 = 5/6$$
+
+Bayes' Theorem gives us a principled way to update our beliefs when new evidence arrives, connecting prior knowledge with observed evidence. In other words, it allows us to start with an initial estimate or hypothesis (the prior) and systematically revise it as we gather more data, producing a refined probability (the posterior) that reflects both what we already knew and what we have observed. This is especially useful in situations where uncertainty is inherent, such as diagnosing a disease based on test results. For example, even if a test for a rare disease is highly accurate, the probability that a patient actually has the disease can remain low if the prior probability is very small.
 
 ## Simpson's paradox
 
@@ -149,6 +211,24 @@ Simpson's paradox is a counterintuitive phenomenon that occurs when trends obser
 
 This is why it’s often useful to break down data into meaningful sub groups to get a more accurate understanding of relationships. We need to consider both the whole and the parts to get the full story.
 
+## The Law of Large Numbers and Central Limit Theorem
+
+The Law of Large Numbers (LLN) describes how the average of repeated independent observations converges to the expected value as the number of observations increases, with the speed of convergence depending on the expected value and variance of the underlying distribution. In simple terms: the more data you collect, the more the “average outcome” behaves like what you would expect in theory. Small samples can fluctuate, but larger samples produce averages that closely reflect the true expected value.
+
+**Example**: Suppose we flip a fair coin multiple times and record the proportion of heads. As the number of flips increases, the sample mean gets closer to the true probability of heads, which is 0.5:
+
+* After 5 flips, we might observe 3 heads → sample mean = 3/5 = 0.6
+* After 50 flips, we might observe 26 heads → sample mean = 26/50 = 0.52
+* After 500 flips, we might observe 248 heads → sample mean = 248/500 = 0.496
+
+This underpins many statistical practices because it justifies the idea that with enough data, averages become stable and predictable.
+
+**Central Limit Theorem (CLT)** builds on this idea by describing the distribution of those averages. It states that, the distribution of sample means approaches normality for large, independent, identically distributed (i.i.d.) observations with finite variance, regardless of the original distribution of the data. This is why standard confidence intervals and hypothesis tests can be used even when the underlying data is not normally distributed. However, if the underlying data has heavy tails or infinite variance (like some power law distributions), the convergence may be slower, and normal approximations can be misleading.
+
+**Example**: Imagine we flip a fair coin 10 times and calculate the proportion of heads. If we repeat this experiment 1,000 times and plot a histogram of the 1,000 sample means, we will see a bell-shaped curve centred around 0.5. Each histogram bar represents the proportion of heads in a 10-flip sample. Even though individual flips are binary, the distribution of the averages across many samples is approximately normal, illustrating the Central Limit Theorem.
+
+The LLN ensures that averages stabilise as we collect more data, while the CLT shows that the distribution of those averages becomes predictable and bell-shaped, allowing us to make reliable inferences from random, variable observations.
+
 ## Conclusion
 
-Probability allows us to handle uncertainty by quantifying the likelihood of different outcomes. In statistics, it underpins the process of making inferences, testing hypotheses, and predicting future events. For hands-on practice, I would reccommend using something like [brilliant.org](https://brilliant.org/) as they have plenty of examples to work through.
+Probability allows us to handle uncertainty by quantifying the likelihood of different outcomes. In statistics, it underpins the process of making inferences, testing hypotheses, and predicting future events. For hands-on practice, I would recommend using something like [brilliant.org](https://brilliant.org/) as they have plenty of examples to work through.

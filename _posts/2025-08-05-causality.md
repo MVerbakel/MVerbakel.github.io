@@ -732,7 +732,9 @@ For binary outcomes, linear regression is still commonly used (known as Linear P
 
 LPMs have other practical drawbacks: they can predict probabilities outside the $[0,1]$ range, and the variance of residuals depends on the predicted probability (heteroskedasticity), peaking around 0.5. This violates ordinary least squares (OLS) assumptions, potentially distorting standard errors. Therefore, it is important to use robust (heteroskedasticity-consistent) standard errors and be cautious when predicted probabilities are close to 0 or 1.
 
-If more accurate modeling of the relationship between covariates and the outcome is needed, especially for prediction or rare outcomes, logistic regression is often preferred. However, logistic regression coefficients represent log-odds ratios rather than probability differences, so $\beta_1$ is not directly interpretable as the ATE. To recover the ATE on the probability scale, two common methods are:
+If more accurate modeling of the relationship between covariates and the outcome is needed, especially for prediction or rare outcomes, logistic regression is often preferred. However, logistic regression coefficients represent log-odds ratios rather than probability differences, so $\beta_1$ is not directly interpretable as the ATE. This is because logistic regression models a latent continuous propensity that is squashed by the logistic function. The same absolute change in probability corresponds to different changes in log-odds depending on the covariate values and residual variation. Consequently, the log-odds coefficient for treatment does not directly equal the probability difference between treated and untreated groups. 
+
+To recover the ATE on the probability scale, two common methods are:
 
 1. **Average Marginal Effects (AME):**
    For each observation, compute the marginal effect of treatment:
