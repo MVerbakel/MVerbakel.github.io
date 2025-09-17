@@ -158,7 +158,42 @@ Divide joint probability of A and B, by the marginal probability of B.
 
 ## Odds
 
-**Odds** are a different way of expressing the likelihood of an event. While probability is the ratio of favorable outcomes to total outcomes, odds are typically expressed as the ratio of favorable outcomes to unfavorable outcomes. For example, if you have a 1 in 5 chance of winning, the odds are 1:5. Odds magnify probabilities, so they allow us to compare probabilities more easily by focusing on large whole numbers. For example, comparing probabilities 0.01 and 0.005 is difficult to interpret directly, but the odds 99:1 vs 199:1 make it easier to see that one is roughly twice as likely as the other.
+Odds are a different way of expressing the likelihood of an event. While probability is the ratio of favorable outcomes to total outcomes, odds are typically expressed as the ratio of favorable outcomes to unfavorable outcomes. For example, if you have a 1 in 5 chance of winning, the odds are 1:4. Odds magnify probabilities, so they allow us to compare probabilities more easily by focusing on large whole numbers. For example, comparing probabilities 0.01 and 0.005 is difficult to interpret directly, but the odds 99:1 vs 199:1 make it easier to see that one is roughly twice as likely as the other. 
+
+The table below shows how probabilities map to odds. Notice that when the probability is 0.5 (a 50/50 chance), the odds are 1:1 (“even odds”). This is the natural dividing line: probabilities above 0.5 correspond to odds greater than 1:1, while probabilities below 0.5 correspond to odds less than 1:1.
+
+| Probability (p = odds / (1 + odds)) | Odds (odds = p / (1-p)) | Probability spoken as “1 in …” |
+| ---------------------------------------------------------- | ---------------- | ------------------------------ |
+| 0.01                                                       | 1:99             | 1 in 100                       |
+| 0.05                                                       | 1:19             | 1 in 20                        |
+| 0.10                                                       | 1:9              | 1 in 10                        |
+| 0.20                                                       | 1:4              | 1 in 5                         |
+| 0.25                                                       | 1:3              | 1 in 4                         |
+| 0.33                                                       | 1:2              | 1 in 3                         |
+| 0.50                                                       | 1:1              | 1 in 2 (“even odds”)           |
+| 0.75                                                       | 3:1              | 3 in 4                         |
+| 0.90                                                       | 9:1              | 9 in 10                        |
+| 0.95                                                       | 19:1             | 19 in 20                       |
+| 0.99                                                       | 99:1             | 99 in 100                      |
+
+### Application
+
+Most Data Scientists are familiar with odds from logistic regression, which models a binary outcome by taking the log of the odds (log-odds) of the event, mapping probabilities from the range [0,1] onto the continuous scale (-∞, ∞). Below the tipping point of $p = 0.5$, the log-odds become negative, reflecting that the event is more likely not to occur than to occur. The resulting coefficients describe how a one-unit change in a feature affects the log-odds of the outcome. Exponentiating the coefficients gives the odds ratio, which tells us how the odds of the event change for a one-unit increase in the feature.
+
+For example, suppose we are predicting lung cancer, and the coefficient for smoking is β = log(2) ≈ 0.693. The odds ratio is e^β = 2, meaning smokers have twice the odds of developing the illness compared to non-smokers. The odds ratio compares the odds of two groups, so in this example the odds could be 1:4 for non-smokers and 1:2 for smokers, giving the odds ratio of 0.5 / 0.25 = 2. 
+
+For individual level predictions, probabilities are usually more intuitive, so the predicted log odds for each observation is typically converted to a probability:
+
+$$
+p_i = \frac{e^{\text{log-odds}_i}}{1 + e^{\text{log-odds}_i}}
+$$
+
+| Observation | Feature     | Log-odds | Odds | Probability |
+| ----------- | ----------- | ------------------------------ | ------------------------------ | ------------------- |
+| 1           | Smoking = 1 | 0.693                          | 2:1                            | 0.667               |
+| 2           | Smoking = 0 | -0.693                         | 1:2                            | 0.333               |
+
+A threshold can then be applied to decide the predicted class (e.g. p > 0.5 = 1, else 0), with the cutoff tuned to balance recall (also called sensitivity or true positive rate: % of positive class correctly predicted), and precision (% of predicted positives that are actually positive).
 
 ## Combinations and permutations
 
